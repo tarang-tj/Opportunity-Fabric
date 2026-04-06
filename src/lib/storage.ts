@@ -1,3 +1,4 @@
+import { clearProgress } from "@/lib/progress";
 import type { StudentProfile } from "./types";
 import { STORAGE_KEY } from "./types";
 
@@ -38,4 +39,5 @@ export function clearProfile(): void {
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(LEGACY_SESSION_ONLY);
   sessionStorage.removeItem(STORAGE_KEY);
+  clearProgress();
 }

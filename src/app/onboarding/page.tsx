@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
+import { PRIMARY_GOAL_LABELS } from "@/lib/profileLabels";
 import { saveProfile } from "@/lib/storage";
 import type {
   IncomePriority,
@@ -11,15 +12,15 @@ import type {
   WeeklyHours,
 } from "@/lib/types";
 
-const GOALS: { value: PrimaryGoal; label: string; hint: string }[] = [
-  { value: "software_engineering", label: "Software & coding", hint: "Apps, systems, tech" },
-  { value: "data_analytics", label: "Data & analytics", hint: "Numbers, dashboards, research" },
-  { value: "product_management", label: "Product & strategy", hint: "Features, users, roadmaps" },
-  { value: "consulting", label: "Consulting", hint: "Case prep, client-style work" },
-  { value: "healthcare", label: "Healthcare", hint: "Pre-med, public health, biotech" },
-  { value: "research_grad_school", label: "Research / grad school", hint: "Labs, papers, PhD track" },
-  { value: "creative_design", label: "Design & creative", hint: "UX, visual, content" },
-  { value: "exploring", label: "I’m still figuring it out", hint: "Totally OK" },
+const GOALS: { value: PrimaryGoal; hint: string }[] = [
+  { value: "software_engineering", hint: "Apps, systems, tech" },
+  { value: "data_analytics", hint: "Numbers, dashboards, research" },
+  { value: "product_management", hint: "Features, users, roadmaps" },
+  { value: "consulting", hint: "Case prep, client-style work" },
+  { value: "healthcare", hint: "Pre-med, public health, biotech" },
+  { value: "research_grad_school", hint: "Labs, papers, PhD track" },
+  { value: "creative_design", hint: "UX, visual, content" },
+  { value: "exploring", hint: "Totally OK to be undecided" },
 ];
 
 const inputClass =
@@ -72,7 +73,8 @@ export default function OnboardingPage() {
           </h1>
           <p className="mt-3 text-[var(--muted)] leading-relaxed">
             No wrong answers. We use this to shape a visual roadmap: classes, jobs, clubs, and
-            other moves, each with short explanations for every idea.
+            other moves, each with short explanations for every idea. Guess if you need to: you
+            can update everything later from the roadmap.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-10 space-y-10">
@@ -80,6 +82,10 @@ export default function OnboardingPage() {
               <span className="text-sm font-semibold text-[var(--foreground)]">
                 What should we call you?{" "}
                 <span className="font-normal text-[var(--muted)]">(optional)</span>
+              </span>
+              <span className="block text-xs text-[var(--muted)]">
+                Used in friendly copy on your roadmap. Skip if you prefer to stay anonymous on
+                this device.
               </span>
               <input
                 value={nickname}
@@ -114,7 +120,9 @@ export default function OnboardingPage() {
                         className="mt-1 size-4 accent-[var(--accent)]"
                       />
                       <div>
-                        <span className="font-medium text-[var(--foreground)]">{g.label}</span>
+                        <span className="font-medium text-[var(--foreground)]">
+                          {PRIMARY_GOAL_LABELS[g.value]}
+                        </span>
                         <p className="mt-0.5 text-xs text-[var(--muted)]">{g.hint}</p>
                       </div>
                     </div>
@@ -128,7 +136,8 @@ export default function OnboardingPage() {
                 Anything else we should know?
               </span>
               <span className="block text-xs text-[var(--muted)]">
-                Interests, identity, constraints: whatever helps paint the picture.
+                Interests, identity, constraints: whatever helps paint the picture. One or two
+                sentences is enough; you can always add more when you edit your profile.
               </span>
               <textarea
                 value={focusNotes}
@@ -144,6 +153,9 @@ export default function OnboardingPage() {
                 <span className="text-sm font-semibold text-[var(--foreground)]">
                   When do you hope to graduate?
                 </span>
+                <span className="block text-xs text-[var(--muted)]">
+                  A rough year is fine. Change it if you switch programs or timelines.
+                </span>
                 <input
                   type="number"
                   min={2025}
@@ -156,6 +168,10 @@ export default function OnboardingPage() {
               <label className="block space-y-2">
                 <span className="text-sm font-semibold text-[var(--foreground)]">
                   What term is it for you?
+                </span>
+                <span className="block text-xs text-[var(--muted)]">
+                  Pick the season your campus is in right now (quarter or semester style both
+                  work).
                 </span>
                 <select
                   value={quarter}
@@ -176,6 +192,10 @@ export default function OnboardingPage() {
               <legend className="text-sm font-semibold text-[var(--foreground)]">
                 Outside of class, how much time do you realistically have?
               </legend>
+              <p className="text-xs text-[var(--muted)]">
+                Not class or study hours. Think jobs, clubs, volunteering, side projects, and
+                family obligations.
+              </p>
               <select
                 value={weeklyHours}
                 onChange={(e) => setWeeklyHours(e.target.value as WeeklyHours)}
@@ -197,6 +217,10 @@ export default function OnboardingPage() {
                 />
                 <span className="text-sm font-medium text-[var(--foreground)] leading-snug">
                   I need to earn money while I&apos;m in school
+                  <span className="mt-1 block text-xs font-normal text-[var(--muted)]">
+                    We weight paid work, internships, and lighter extracurriculars when this is
+                    on.
+                  </span>
                 </span>
               </label>
               {needIncome && (
@@ -222,26 +246,33 @@ export default function OnboardingPage() {
             </div>
 
             <div className="flex flex-col gap-4 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 sm:flex-row sm:flex-wrap">
-              <label className="flex flex-1 cursor-pointer items-center gap-3">
+              <label className="flex flex-1 cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
                   checked={remoteOk}
                   onChange={(e) => setRemoteOk(e.target.checked)}
-                  className="size-4 accent-[var(--accent)]"
+                  className="mt-0.5 size-4 accent-[var(--accent)]"
                 />
                 <span className="text-sm text-[var(--foreground)]">
                   I&apos;m open to remote chats, events, or work
+                  <span className="mt-1 block text-xs text-[var(--muted)]">
+                    Includes virtual career fairs, coffee chats, and hybrid internships.
+                  </span>
                 </span>
               </label>
-              <label className="flex flex-1 cursor-pointer items-center gap-3">
+              <label className="flex flex-1 cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
                   checked={visaSensitive}
                   onChange={(e) => setVisaSensitive(e.target.checked)}
-                  className="size-4 accent-[var(--accent)]"
+                  className="mt-0.5 size-4 accent-[var(--accent)]"
                 />
                 <span className="text-sm text-[var(--foreground)]">
                   My visa or work permission needs extra care
+                  <span className="mt-1 block text-xs text-[var(--muted)]">
+                    We steer away from risky unpaid work assumptions and flag job moves that may
+                    need a second look.
+                  </span>
                 </span>
               </label>
             </div>
@@ -279,7 +310,8 @@ export default function OnboardingPage() {
               </li>
               <li className="flex gap-2">
                 <span className="font-bold text-[var(--accent)]">3.</span>
-                Copy, print, or reset anytime. Data stays on this device.
+                Save snapshots, compare plans, export Markdown, or reset anytime. Data stays on
+                this device.
               </li>
             </ul>
           </div>

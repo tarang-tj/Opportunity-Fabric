@@ -3,110 +3,28 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { IconAlert, IconMap, KindGlyph } from "@/components/FabricIcons";
+import { IconAlert, IconMap } from "@/components/FabricIcons";
+import { OpportunityRoadmapCard } from "@/components/OpportunityRoadmapCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { buildRoadmap } from "@/lib/engine";
-import { roadmapToPlainText } from "@/lib/formatRoadmap";
+import {
+  downloadMarkdownFile,
+  roadmapToMarkdown,
+  roadmapToPlainText,
+} from "@/lib/formatRoadmap";
+import { buildInsights } from "@/lib/insights";
+import {
+  loadProgress,
+  progressCounts,
+  toggleDone,
+  toggleWorking,
+  type RoadmapProgress,
+} from "@/lib/progress";
+import { buildRoadmapIcs, downloadIcsFile } from "@/lib/roadmapIcs";
+import { saveNamedPlan } from "@/lib/savedPlans";
+import { encodeProfileForShare } from "@/lib/shareCodec";
 import { clearProfile, loadProfile } from "@/lib/storage";
-import type { FabricOpportunity, RoadmapResult, StudentProfile } from "@/lib/types";
-
-const kindUi: Record<
-  FabricOpportunity["kind"],
-  { label: string; stripe: string; chip: string }
-> = {
-  course_strategy: {
-    label: "Classes & order",
-    stripe: "from-violet-500 to-indigo-500",
-    chip: "bg-violet-500/15 text-violet-800 dark:text-violet-200",
-  },
-  experience: {
-    label: "Hands-on experience",
-    stripe: "from-emerald-500 to-teal-500",
-    chip: "bg-emerald-500/15 text-emerald-900 dark:text-emerald-200",
-  },
-  campus_resource: {
-    label: "Campus support",
-    stripe: "from-sky-500 to-cyan-500",
-    chip: "bg-sky-500/15 text-sky-900 dark:text-sky-200",
-  },
-  job_search: {
-    label: "Jobs & internships",
-    stripe: "from-amber-500 to-orange-500",
-    chip: "bg-amber-500/20 text-amber-950 dark:text-amber-200",
-  },
-  networking: {
-    label: "People & community",
-    stripe: "from-rose-500 to-pink-500",
-    chip: "bg-rose-500/15 text-rose-900 dark:text-rose-200",
-  },
-  portfolio: {
-    label: "Portfolio & projects",
-    stripe: "from-fuchsia-500 to-purple-500",
-    chip: "bg-fuchsia-500/15 text-fuchsia-900 dark:text-fuchsia-200",
-  },
-};
-
-const effortLabel: Record<FabricOpportunity["effort"], string> = {
-  light: "Light lift",
-  moderate: "Steady effort",
-  heavy: "Bigger project",
-};
-
-function OpportunityCard({
-  item,
-  animDelayMs,
-}: {
-  item: FabricOpportunity;
-  animDelayMs: number;
-}) {
-  const ui = kindUi[item.kind];
-  return (
-    <article
-      className="fabric-fade-up group relative overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--card)]/95 shadow-[var(--elev-1)] transition print:shadow-none hover:-translate-y-0.5 hover:shadow-[var(--elev-2)]"
-      style={{ animationDelay: `${animDelayMs}ms`, breakInside: "avoid" }}
-    >
-      <div
-        className={`absolute inset-y-3 left-0 w-1.5 rounded-full bg-gradient-to-b ${ui.stripe} opacity-90 print:opacity-100`}
-        aria-hidden
-      />
-      <div className="relative pl-6 pr-5 pb-5 pt-5 sm:pl-7 sm:pr-6 sm:pt-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <span
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--card)] to-[var(--background)] text-[var(--accent)] shadow-inner ring-1 ring-[var(--line)]"
-            aria-hidden
-          >
-            <KindGlyph kind={item.kind} className="size-5" />
-          </span>
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${ui.chip}`}
-          >
-            {ui.label}
-          </span>
-          <span className="ml-auto rounded-full border border-[var(--line)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
-            {effortLabel[item.effort]}
-          </span>
-        </div>
-        <h3 className="font-display mt-4 text-xl font-semibold leading-snug text-[var(--foreground)]">
-          {item.title}
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{item.summary}</p>
-        <div className="mt-5 rounded-2xl bg-[var(--gold-soft)]/60 p-4 dark:bg-[var(--gold-soft)]/10">
-          <p className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
-            Why this fits you
-          </p>
-          <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--foreground)]/90">
-            {item.because.map((b) => (
-              <li key={b} className="flex gap-2">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </article>
-  );
-}
+import type { RoadmapResult, StudentProfile } from "@/lib/types";
 
 const phaseDecor = [
   { num: "1", blob: "from-[var(--accent)]/30 to-transparent" },
@@ -117,10 +35,18 @@ const phaseDecor = [
 export default function RoadmapPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [progress, setProgress] = useState<RoadmapProgress>({
+    doneIds: [],
+    workingIds: [],
+  });
   const [toast, setToast] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState("");
+  const [saveName, setSaveName] = useState("");
+  const [showSave, setShowSave] = useState(false);
 
   useEffect(() => {
     setProfile(loadProfile());
+    setProgress(loadProgress());
   }, []);
 
   const roadmap: RoadmapResult | null = useMemo(
@@ -128,9 +54,38 @@ export default function RoadmapPage() {
     [profile]
   );
 
+  const validIds = useMemo(() => {
+    const s = new Set<string>();
+    roadmap?.phases.forEach((p) =>
+      p.opportunities.forEach((o) => s.add(o.id))
+    );
+    return s;
+  }, [roadmap]);
+
+  const counts = useMemo(
+    () => progressCounts(progress, validIds),
+    [progress, validIds]
+  );
+
+  const insights = useMemo(
+    () => (profile && roadmap ? buildInsights(profile, roadmap) : []),
+    [profile, roadmap]
+  );
+
+  useEffect(() => {
+    if (!profile || typeof window === "undefined") return;
+    const t = encodeProfileForShare(profile);
+    setShareUrl(
+      `${window.location.origin}/roadmap/shared?t=${encodeURIComponent(t)}`
+    );
+  }, [profile]);
+
   const totalCards = roadmap
     ? roadmap.phases.reduce((n, p) => n + p.opportunities.length, 0)
     : 0;
+
+  const pct =
+    counts.total > 0 ? Math.round((counts.done / counts.total) * 100) : 0;
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -148,6 +103,39 @@ export default function RoadmapPage() {
     }
   }, [profile, roadmap, showToast]);
 
+  const handleCopyShare = useCallback(async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showToast("Share link copied. Anyone with the link can view a read-only roadmap.");
+    } catch {
+      showToast("Could not copy link.");
+    }
+  }, [shareUrl, showToast]);
+
+  const handleIcs = useCallback(() => {
+    if (!profile || !roadmap) return;
+    const ics = buildRoadmapIcs(roadmap, profile);
+    downloadIcsFile(ics, "opportunity-fabric-roadmap.ics");
+    showToast("Calendar file downloaded. Open it to add reminders to Apple or Google Calendar.");
+  }, [profile, roadmap, showToast]);
+
+  const handleDownloadMd = useCallback(() => {
+    if (!profile || !roadmap) return;
+    const md = roadmapToMarkdown(profile, roadmap, {
+      doneIds: progress.doneIds,
+      workingIds: progress.workingIds,
+    });
+    const slug = (profile.nickname || "my-roadmap")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 48);
+    downloadMarkdownFile(md, `opportunity-fabric-${slug || "roadmap"}.md`);
+    showToast("Markdown file downloaded. Open in any editor or note app.");
+  }, [profile, roadmap, progress, showToast]);
+
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
@@ -162,8 +150,27 @@ export default function RoadmapPage() {
     }
     clearProfile();
     setProfile(null);
+    setProgress({ doneIds: [], workingIds: [] });
     router.push("/onboarding");
   }, [router]);
+
+  const onToggleDone = useCallback((id: string) => {
+    setProgress(toggleDone(id));
+  }, []);
+
+  const onToggleWorking = useCallback((id: string) => {
+    setProgress(toggleWorking(id));
+  }, []);
+
+  const handleSavePlan = useCallback(() => {
+    if (!profile) return;
+    const plan = saveNamedPlan(saveName || "My plan", profile);
+    if (plan) {
+      setSaveName("");
+      setShowSave(false);
+      showToast(`Saved as “${plan.name}”. View all under Saved plans.`);
+    }
+  }, [profile, saveName, showToast]);
 
   return (
     <>
@@ -172,7 +179,7 @@ export default function RoadmapPage() {
         {toast && (
           <div
             role="status"
-            className="print:hidden fabric-fade-up fixed bottom-6 left-1/2 z-[60] max-w-[min(90vw,24rem)] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-center text-sm font-medium text-[var(--foreground)] shadow-xl"
+            className="print:hidden fabric-fade-up fixed bottom-6 left-1/2 z-[60] max-w-[min(90vw,26rem)] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-center text-sm font-medium text-[var(--foreground)] shadow-xl"
           >
             {toast}
           </div>
@@ -201,6 +208,29 @@ export default function RoadmapPage() {
           </div>
         ) : (
           <>
+            <div className="fabric-panel fabric-fade-up mb-6 print:hidden">
+              <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+                    Your momentum
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <span className="text-2xl font-bold text-[var(--foreground)]">{pct}%</span>
+                    <span className="text-sm text-[var(--muted)]">
+                      {counts.done} of {counts.total} moves marked done
+                      {counts.working > 0 ? ` · ${counts.working} in progress` : ""}
+                    </span>
+                  </div>
+                </div>
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--line)] sm:max-w-xs sm:flex-none">
+                  <div
+                    className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="fabric-panel fabric-fade-up mb-8 flex flex-wrap items-center justify-center gap-4 px-5 py-4 print:hidden sm:justify-between">
               <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-[var(--muted)]">
                 <span className="rounded-full bg-[var(--background)] px-3 py-1 font-semibold text-[var(--foreground)] ring-1 ring-[var(--line)]">
@@ -211,7 +241,7 @@ export default function RoadmapPage() {
                 </span>
               </div>
               <p className="text-center text-xs text-[var(--muted)] sm:text-right">
-                Tip: use Print to save a PDF, or Copy to paste anywhere.
+                Check off cards as you go. Progress saves on this device.
               </p>
             </div>
 
@@ -237,30 +267,97 @@ export default function RoadmapPage() {
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-5 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-4 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
                 >
                   Print / PDF
                 </button>
                 <button
                   type="button"
-                  onClick={handleCopy}
-                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-5 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                  onClick={handleIcs}
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-4 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
                 >
-                  Copy as text
+                  Add to calendar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadMd}
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-4 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                >
+                  Download .md
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-4 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                >
+                  Copy text
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyShare}
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-4 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                >
+                  Copy share link
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSave((s) => !s)}
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-4 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                >
+                  Save snapshot
                 </button>
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="rounded-full px-5 py-2.5 text-sm font-semibold text-[var(--muted)] underline-offset-4 hover:text-[var(--accent)] hover:underline"
+                  className="rounded-full px-4 py-2.5 text-sm font-semibold text-[var(--muted)] underline-offset-4 hover:text-[var(--accent)] hover:underline"
                 >
-                  Clear & start over
+                  Clear all
                 </button>
               </div>
             </div>
 
+            {showSave && (
+              <div className="fabric-panel fabric-fade-up mt-6 flex flex-col gap-3 p-5 print:hidden sm:flex-row sm:items-end">
+                <label className="flex-1 space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+                    Snapshot name
+                  </span>
+                  <input
+                    value={saveName}
+                    onChange={(e) => setSaveName(e.target.value)}
+                    placeholder="e.g. Fall plan, Pre-internship"
+                    className="w-full rounded-2xl border border-[var(--line)] bg-[var(--background)] px-4 py-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/25"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={handleSavePlan}
+                  className="rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-bold text-white shadow-md transition hover:brightness-110"
+                >
+                  Save to device
+                </button>
+              </div>
+            )}
+
+            {insights.length > 0 && (
+              <div className="fabric-panel fabric-fade-up mt-8 p-6 print:hidden">
+                <p className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
+                  Fabric read on your inputs
+                </p>
+                <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                  {insights.map((line) => (
+                    <li key={line} className="flex gap-2">
+                      <span className="text-[var(--accent)]">→</span>
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {roadmap.flags.length > 0 && (
               <div
-                className="fabric-fade-up fabric-panel mt-10 border-amber-400/35 bg-gradient-to-br from-amber-50/95 to-orange-50/90 p-5 dark:from-amber-950/35 dark:to-orange-950/20 dark:border-amber-800/40"
+                className="fabric-fade-up fabric-panel mt-8 border-amber-400/35 bg-gradient-to-br from-amber-50/95 to-orange-50/90 p-5 dark:from-amber-950/35 dark:to-orange-950/20 dark:border-amber-800/40"
                 style={{ animationDelay: "60ms" }}
               >
                 <p className="flex items-center gap-2 text-sm font-bold text-amber-900 dark:text-amber-200">
@@ -315,10 +412,14 @@ export default function RoadmapPage() {
 
                       <div className="mt-8 grid gap-5 md:grid-cols-2 print:grid-cols-1">
                         {phase.opportunities.map((o, oi) => (
-                          <OpportunityCard
+                          <OpportunityRoadmapCard
                             key={o.id}
                             item={o}
                             animDelayMs={80 + i * 140 + oi * 60}
+                            done={progress.doneIds.includes(o.id)}
+                            working={progress.workingIds.includes(o.id)}
+                            onToggleDone={() => onToggleDone(o.id)}
+                            onToggleWorking={() => onToggleWorking(o.id)}
                           />
                         ))}
                       </div>
@@ -333,12 +434,26 @@ export default function RoadmapPage() {
                 Life changes, so should this plan. Tweak your answers anytime and we will redraw
                 the map.
               </p>
-              <Link
-                href="/onboarding"
-                className="shrink-0 rounded-full border-2 border-[var(--foreground)]/15 px-6 py-3 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/50"
-              >
-                Update my answers
-              </Link>
+              <div className="flex flex-wrap justify-center gap-2">
+                <Link
+                  href="/onboarding"
+                  className="rounded-full border-2 border-[var(--foreground)]/15 px-6 py-3 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/50"
+                >
+                  Update my answers
+                </Link>
+                <Link
+                  href="/plans"
+                  className="rounded-full bg-[var(--foreground)] px-6 py-3 text-sm font-bold text-[var(--background)] transition hover:opacity-90 dark:bg-[var(--gold)] dark:text-[#1a1508]"
+                >
+                  Saved plans
+                </Link>
+                <Link
+                  href="/import"
+                  className="rounded-full border-2 border-[var(--foreground)]/15 px-6 py-3 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/50"
+                >
+                  Preview .md file
+                </Link>
+              </div>
             </div>
           </>
         )}

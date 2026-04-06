@@ -17,7 +17,7 @@ function BentoFeature({
 }: {
   icon: ReactNode;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   delayMs?: number;
 }) {
@@ -48,7 +48,7 @@ export default function Home() {
           <div className="relative mx-auto max-w-6xl">
             <div className="fabric-fade-up mx-auto max-w-3xl text-center">
               <p className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--card)]/90 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--muted)]">
-                Private · No login · Saves on your device
+                Private · No login · Light or dark · Saves on your device
               </p>
               <h1 className="font-display mt-8 text-[2.35rem] font-semibold leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl lg:leading-[1.02]">
                 Turn scattered goals into{" "}
@@ -73,4 +73,150 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/roadmap"
-                  className="inline-flex w-full min-w-[200px] items-center justify-center rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)]/90 px-8 py-4 text-sm font-bold text-[var(--foreground)] b
+                  className="inline-flex w-full min-w-[200px] items-center justify-center rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)]/90 px-8 py-4 text-sm font-bold text-[var(--foreground)] backdrop-blur-sm transition hover:border-[var(--accent)]/35 sm:w-auto"
+                >
+                  Open my roadmap
+                </Link>
+              </div>
+              <p className="mx-auto mt-6 max-w-lg text-xs leading-relaxed text-[var(--muted)]">
+                Your roadmap stays on this browser after you leave. Refresh safe. Use{" "}
+                <strong className="font-medium text-[var(--foreground)]/85">Clear</strong> on the
+                roadmap page if you want a fresh start.
+              </p>
+            </div>
+
+            <div
+              className="fabric-fade-up relative mx-auto mt-20 max-w-4xl"
+              style={{ animationDelay: "100ms" }}
+            >
+              <div className="fabric-panel relative p-8 sm:p-10">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--muted)]">
+                    How it flows
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-xs font-semibold text-[var(--muted)]">
+                    <span className="rounded-full bg-[var(--background)] px-3 py-1 ring-1 ring-[var(--line)]">
+                      3 phases
+                    </span>
+                    <span className="rounded-full bg-[var(--background)] px-3 py-1 ring-1 ring-[var(--line)]">
+                      Plain-language “why”
+                    </span>
+                    <span className="rounded-full bg-[var(--background)] px-3 py-1 ring-1 ring-[var(--line)]">
+                      Share link & snapshots
+                    </span>
+                    <span className="rounded-full bg-[var(--background)] px-3 py-1 ring-1 ring-[var(--line)]">
+                      Calendar, .md, print
+                    </span>
+                  </div>
+                </div>
+                <ol className="mt-8 grid gap-6 sm:grid-cols-3">
+                  {[
+                    {
+                      n: "01",
+                      t: "Tell your story",
+                      d: "Goals, time, money, visa context. Takes a few minutes.",
+                    },
+                    {
+                      n: "02",
+                      t: "See the map",
+                      d: "Start here, build momentum, finish strong. Each card explains itself.",
+                    },
+                    {
+                      n: "03",
+                      t: "Act your way",
+                      d: "Track done and in progress, save named snapshots, share a read-only link, or export to calendar and Markdown when you need it elsewhere.",
+                    },
+                  ].map((row) => (
+                    <li key={row.n} className="relative pl-12">
+                      <span className="font-display absolute left-0 top-0 text-2xl font-bold text-[var(--accent)]/90">
+                        {row.n}
+                      </span>
+                      <p className="font-semibold text-[var(--foreground)]">{row.t}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{row.d}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-[var(--line)] bg-[var(--card)]/25 px-4 py-6 sm:px-6">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-10 gap-y-3 text-center text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+            <span>Built for real schedules</span>
+            <span className="hidden text-[var(--line)] sm:inline">|</span>
+            <span>Explainable suggestions</span>
+            <span className="hidden text-[var(--line)] sm:inline">|</span>
+            <span>Designed to plug into campus data later</span>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+          <div className="fabric-fade-up mx-auto max-w-2xl text-center" style={{ animationDelay: "40ms" }}>
+            <h2 className="font-display text-3xl font-semibold text-[var(--foreground)] sm:text-4xl">
+              Why it feels different
+            </h2>
+            <p className="mt-4 text-[var(--muted)]">
+              No jargon, no black box. Just a calmer way to see what to do next.
+            </p>
+          </div>
+
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            <BentoFeature
+              icon={<IconScale className="size-6" />}
+              title="Tradeoffs out in the open"
+              delayMs={120}
+            >
+              Work, money, visas, and how much time you actually have: we bake that into the plan
+              instead of pretending you can join ten clubs and sleep.
+            </BentoFeature>
+            <BentoFeature
+              icon={<IconLightbulb className="size-6" />}
+              title="Every idea says why"
+              delayMs={180}
+            >
+              Short reasons under each suggestion so the roadmap feels debatable and adjustable,
+              not like a mystery algorithm.
+            </BentoFeature>
+            <BentoFeature
+              icon={<IconOrbit className="size-6" />}
+              title="Room to grow"
+              delayMs={240}
+            >
+              Start lean today. Later this can connect to real job feeds, clubs, and advising
+              tools when schools and partners plug in.
+            </BentoFeature>
+          </div>
+
+          <div
+            className="fabric-fade-up fabric-panel relative mx-auto mt-16 max-w-4xl overflow-hidden p-10 sm:p-12"
+            style={{ animationDelay: "280ms" }}
+          >
+            <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[var(--accent-soft)]/50 blur-3xl dark:opacity-40" />
+            <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--sage-soft)] text-[var(--sage)]">
+                <IconMap className="size-9" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl font-semibold text-[var(--foreground)] sm:text-2xl">
+                  Ready when you are
+                </h3>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+                  The questionnaire is friendly and specific. On the other side you get a visual
+                  timeline you can print, export, share as a link, or revisit from saved plans on
+                  this device.
+                </p>
+                <Link
+                  href="/onboarding"
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[var(--accent)] underline-offset-4 hover:underline"
+                >
+                  Start the questionnaire <span aria-hidden>→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </>
+  );
+}

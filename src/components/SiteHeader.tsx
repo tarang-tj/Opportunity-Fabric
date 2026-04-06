@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 function Spark() {
   return (
@@ -30,6 +31,9 @@ function Spark() {
 
 const nav = [
   { href: "/onboarding", label: "Your profile" },
+  { href: "/plans", label: "Saved plans" },
+  { href: "/plans/compare", label: "Compare" },
+  { href: "/import", label: "Import .md" },
   { href: "/roadmap", label: "My roadmap", primary: true as const },
 ];
 
@@ -72,37 +76,40 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 sm:flex sm:gap-2" aria-label="Main">
-          {nav.map((item) =>
-            item.primary ? (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition hover:opacity-90 ${
-                  pathname === item.href
-                    ? "bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/25"
-                    : "bg-[var(--foreground)] text-[var(--background)] dark:bg-[var(--gold)] dark:text-[#1a1508]"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
-                className={`rounded-full px-3 py-2 text-sm font-medium transition ${
-                  pathname === item.href
-                    ? "bg-[var(--accent-soft)] text-[var(--foreground)]"
-                    : "text-[var(--muted)] hover:bg-[var(--accent-soft)]/80 hover:text-[var(--foreground)]"
-                }`}
-              >
-                {item.label}
-              </Link>
-            )
-          )}
-        </nav>
+        <div className="hidden items-center gap-3 sm:flex">
+          <nav className="flex items-center gap-1 sm:gap-2" aria-label="Main">
+            {nav.map((item) =>
+              item.primary ? (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition hover:opacity-90 ${
+                    pathname === item.href
+                      ? "bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/25"
+                      : "bg-[var(--foreground)] text-[var(--background)] dark:bg-[var(--gold)] dark:text-[#1a1508]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                  className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+                    pathname === item.href
+                      ? "bg-[var(--accent-soft)] text-[var(--foreground)]"
+                      : "text-[var(--muted)] hover:bg-[var(--accent-soft)]/80 hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+          </nav>
+          <ThemeToggle />
+        </div>
 
         <button
           type="button"
@@ -163,6 +170,12 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <div className="mt-4 border-t border-[var(--line)] pt-4">
+              <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+                Theme
+              </p>
+              <ThemeToggle />
+            </div>
           </nav>
         </div>
       )}
