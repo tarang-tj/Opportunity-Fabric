@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { buildRoadmap } from "@/lib/engine";
-import { loadProfile } from "@/lib/storage";
+import { roadmapToPlainText } from "@/lib/formatRoadmap";
+import { clearProfile, loadProfile } from "@/lib/storage";
 import type { FabricOpportunity, RoadmapResult, StudentProfile } from "@/lib/types";
 
 const kindUi: Record<
@@ -55,10 +57,19 @@ const effortLabel: Record<FabricOpportunity["effort"], string> = {
   heavy: "Bigger project",
 };
 
-function OpportunityCard({ item }: { item: FabricOpportunity }) {
+function OpportunityCard({
+  item,
+  animDelayMs,
+}: {
+  item: FabricOpportunity;
+  animDelayMs: number;
+}) {
   const ui = kindUi[item.kind];
   return (
-    <article className="group relative overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--card)]/95 shadow-md transition hover:-translate-y-0.5 hover:shadow-xl">
+    <article
+      className="fabric-fade-up group relative overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--card)]/95 shadow-md transition hover:-translate-y-0.5 hover:shadow-xl"
+      style={{ animationDelay: `${animDelayMs}ms` }}
+    >
       <div
         className={`absolute inset-y-3 left-0 w-1.5 rounded-full bg-gradient-to-b ${ui.stripe} opacity-90`}
         aria-hidden
@@ -109,7 +120,9 @@ const phaseDecor = [
 ];
 
 export default function RoadmapPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     setProfile(loadProfile());
@@ -120,10 +133,48 @@ export default function RoadmapPage() {
     [profile]
   );
 
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast(null), 2800);
+  }, []);
+
+  const handleCopy = useCallback(async () => {
+    if (!profile || !roadmap) return;
+    const text = roadmapToPlainText(profile, roadmap);
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Copied! Paste into Notes, Google Docs, or an email.");
+    } catch {
+      showToast("Couldn’t copy—try selecting text manually.");
+    }
+  }, [profile, roadmap, showToast]);
+
+  const handleClear = useCallback(() => {
+    if (
+      !window.confirm(
+        "Erase your saved answers on this device? You can always fill the form again."
+      )
+    ) {
+      return;
+    }
+    clearProfile();
+    setProfile(null);
+    router.push("/onboarding");
+  }, [router]);
+
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <main id="main-content" className="mx-auto max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+        {toast && (
+          <div
+            role="status"
+            className="fabric-fade-up fixed bottom-6 left-1/2 z-[60] max-w-[min(90vw,24rem)] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-center text-sm font-medium text-[var(--foreground)] shadow-xl"
+          >
+            {toast}
+          </div>
+        )}
+
         {!profile || !roadmap ? (
           <div className="relative overflow-hidden rounded-[2rem] border border-dashed border-[var(--accent)]/40 bg-[var(--card)]/90 p-12 text-center shadow-lg">
             <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[var(--accent-soft)] blur-3xl dark:opacity-40" />
@@ -134,8 +185,9 @@ export default function RoadmapPage() {
               Your roadmap isn&apos;t here yet
             </h1>
             <p className="mx-auto mt-3 max-w-md text-[var(--muted)] leading-relaxed">
-              Spend a couple minutes on the questionnaire—we save your answers for this browser
-              session and build the map right after.
+              Tell us about your goals once—we save your answers on{" "}
+              <strong className="text-[var(--foreground)]/90">this device</strong> (even if you
+              refresh or open a new tab).
             </p>
             <Link
               href="/onboarding"
@@ -146,26 +198,47 @@ export default function RoadmapPage() {
           </div>
         ) : (
           <>
-            <header className="relative text-center sm:text-left">
-              <div className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-[var(--gold-soft)] blur-3xl dark:opacity-25" />
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
-                Your personalized roadmap
-              </p>
-              <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
-                {roadmap.headline}
-              </h1>
-              {profile.nickname && (
-                <p className="mt-2 text-lg font-medium text-[var(--muted)]">
-                  Hey {profile.nickname} — here&apos;s a path that matches what you shared.
+            <div className="fabric-fade-up flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="relative text-center sm:flex-1 sm:text-left">
+                <div className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-[var(--gold-soft)] blur-3xl dark:opacity-25" />
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
+                  Your personalized roadmap
                 </p>
-              )}
-              <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:mx-0">
-                {roadmap.tradeoffSummary}
-              </p>
-            </header>
+                <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
+                  {roadmap.headline}
+                </h1>
+                {profile.nickname && (
+                  <p className="mt-2 text-lg font-medium text-[var(--muted)]">
+                    Hey {profile.nickname} — here&apos;s a path that matches what you shared.
+                  </p>
+                )}
+                <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:mx-0">
+                  {roadmap.tradeoffSummary}
+                </p>
+              </div>
+              <div className="flex flex-shrink-0 flex-wrap justify-center gap-2 sm:justify-end">
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-5 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                >
+                  Copy as text
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="rounded-full px-5 py-2.5 text-sm font-semibold text-[var(--muted)] underline-offset-4 hover:text-[var(--accent)] hover:underline"
+                >
+                  Clear & start over
+                </button>
+              </div>
+            </div>
 
             {roadmap.flags.length > 0 && (
-              <div className="mt-10 rounded-3xl border border-amber-400/40 bg-gradient-to-br from-amber-50 to-orange-50/80 p-5 dark:from-amber-950/40 dark:to-orange-950/20 dark:border-amber-800/50">
+              <div
+                className="fabric-fade-up mt-10 rounded-3xl border border-amber-400/40 bg-gradient-to-br from-amber-50 to-orange-50/80 p-5 dark:from-amber-950/40 dark:to-orange-950/20 dark:border-amber-800/50"
+                style={{ animationDelay: "60ms" }}
+              >
                 <p className="flex items-center gap-2 text-sm font-bold text-amber-900 dark:text-amber-200">
                   <span aria-hidden>👋</span> Quick heads-up
                 </p>
@@ -211,8 +284,12 @@ export default function RoadmapPage() {
                       </div>
 
                       <div className="mt-8 grid gap-5 md:grid-cols-2">
-                        {phase.opportunities.map((o) => (
-                          <OpportunityCard key={o.id} item={o} />
+                        {phase.opportunities.map((o, oi) => (
+                          <OpportunityCard
+                            key={o.id}
+                            item={o}
+                            animDelayMs={80 + i * 140 + oi * 60}
+                          />
                         ))}
                       </div>
                     </section>

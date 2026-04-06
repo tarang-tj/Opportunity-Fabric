@@ -59,7 +59,7 @@ export default function OnboardingPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <main id="main-content" className="mx-auto max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
         <div className="rounded-[2rem] border border-[var(--line)] bg-[var(--card)]/90 p-8 shadow-lg backdrop-blur-sm sm:p-10">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
             Step 1 of 1
@@ -249,6 +249,10 @@ export default function OnboardingPage() {
             >
               Show me my roadmap →
             </button>
+            <p className="text-center text-xs text-[var(--muted)] sm:text-left">
+              We save your answers on <strong className="text-[var(--foreground)]/90">this device</strong>{" "}
+              so your roadmap survives refresh and new tabs.
+            </p>
           </form>
         </div>
       </main>

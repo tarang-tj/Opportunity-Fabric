@@ -49,6 +49,11 @@ body {
   font-family: var(--font-sans);
 }
 
+::selection {
+  background: var(--accent-soft);
+  color: var(--foreground);
+}
+
 /* Page backdrop: soft mesh + grain */
 .fabric-bg {
   background-color: var(--background);
@@ -79,4 +84,27 @@ body {
 
 .font-display {
   font-family: var(--font-display);
+}
+
+@keyframes fabric-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fabric-fade-up {
+  animation: fabric-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fabric-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
