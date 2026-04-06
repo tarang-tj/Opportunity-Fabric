@@ -51,7 +51,7 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--card)]/80 backdrop-blur-xl">
+    <header className="print:hidden sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--card)]/85 backdrop-blur-xl">
       <a
         href="#main-content"
         className="fixed left-4 top-4 z-[100] -translate-y-20 rounded-xl bg-[var(--foreground)] px-4 py-2 text-sm font-semibold text-[var(--background)] opacity-0 shadow-lg transition focus:translate-y-0 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2"

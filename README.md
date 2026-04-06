@@ -2,7 +2,7 @@
 
 **One intake. Many paths. Explicit tradeoffs.**
 
-Students re-enter the same goals and constraints across advising portals, job boards, LMS tools, and spreadsheets. Opportunity Fabric is a **decision layer**: you map priorities once, and the product returns a **phased roadmap** across courses, experiences, jobs, and campus resources—with a **“because”** on every suggestion so the plan is explainable, not black-box.
+Students re-enter the same goals and constraints across advising portals, job boards, LMS tools, and spreadsheets. Opportunity Fabric is a **decision layer**: you map priorities once, and the product returns a **phased roadmap** across courses, experiences, jobs, and campus resources, with a **“because”** on every suggestion so the plan is explainable, not black-box.
 
 This repository is an **MVP demo**: a rule-based engine and UI you can show in pitches; production Fabric would ingest real institutional and employer data and score paths against live opportunities.
 
@@ -11,9 +11,9 @@ This repository is an **MVP demo**: a rule-based engine and UI you can show in p
 ## Pitch (60 seconds)
 
 - **Problem:** Opportunity discovery is fragmented. Tradeoffs (income vs exploration, bandwidth, visa-safe work, remote vs in-person) are implicit, so students burn time and miss windows.
-- **Solution:** A student-owned **profile + roadmap** that treats college as a **multi-objective optimization** problem with visible rationale—not another checklist app.
+- **Solution:** A student-owned **profile + roadmap** that treats college as a **multi-objective optimization** problem with visible rationale, not another checklist app.
 - **Why now:** Schools and employers both want **better pipelines** and **clearer signals**; a thin intake that powers many surfaces (advising, career services, clubs, hiring) is a plausible **platform wedge**.
-- **This build:** `/onboarding` collects goals and constraints; `/roadmap` renders phased **FabricOpportunities** with rationale lines. Storage is **session-only** for the demo.
+- **This build:** `/onboarding` collects goals and constraints; `/roadmap` renders phased **FabricOpportunities** with rationale lines. Profiles persist in **localStorage** on the device (demo, no backend).
 
 ---
 

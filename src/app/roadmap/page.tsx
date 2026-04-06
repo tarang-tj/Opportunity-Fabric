@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { IconAlert, IconMap, KindGlyph } from "@/components/FabricIcons";
 import { SiteHeader } from "@/components/SiteHeader";
 import { buildRoadmap } from "@/lib/engine";
 import { roadmapToPlainText } from "@/lib/formatRoadmap";
@@ -11,41 +12,35 @@ import type { FabricOpportunity, RoadmapResult, StudentProfile } from "@/lib/typ
 
 const kindUi: Record<
   FabricOpportunity["kind"],
-  { label: string; emoji: string; stripe: string; chip: string }
+  { label: string; stripe: string; chip: string }
 > = {
   course_strategy: {
     label: "Classes & order",
-    emoji: "📚",
     stripe: "from-violet-500 to-indigo-500",
     chip: "bg-violet-500/15 text-violet-800 dark:text-violet-200",
   },
   experience: {
     label: "Hands-on experience",
-    emoji: "🧪",
     stripe: "from-emerald-500 to-teal-500",
     chip: "bg-emerald-500/15 text-emerald-900 dark:text-emerald-200",
   },
   campus_resource: {
     label: "Campus support",
-    emoji: "🏛️",
     stripe: "from-sky-500 to-cyan-500",
     chip: "bg-sky-500/15 text-sky-900 dark:text-sky-200",
   },
   job_search: {
     label: "Jobs & internships",
-    emoji: "💼",
     stripe: "from-amber-500 to-orange-500",
     chip: "bg-amber-500/20 text-amber-950 dark:text-amber-200",
   },
   networking: {
     label: "People & community",
-    emoji: "🤝",
     stripe: "from-rose-500 to-pink-500",
     chip: "bg-rose-500/15 text-rose-900 dark:text-rose-200",
   },
   portfolio: {
     label: "Portfolio & projects",
-    emoji: "✨",
     stripe: "from-fuchsia-500 to-purple-500",
     chip: "bg-fuchsia-500/15 text-fuchsia-900 dark:text-fuchsia-200",
   },
@@ -67,20 +62,20 @@ function OpportunityCard({
   const ui = kindUi[item.kind];
   return (
     <article
-      className="fabric-fade-up group relative overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--card)]/95 shadow-md transition hover:-translate-y-0.5 hover:shadow-xl"
-      style={{ animationDelay: `${animDelayMs}ms` }}
+      className="fabric-fade-up group relative overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--card)]/95 shadow-[var(--elev-1)] transition print:shadow-none hover:-translate-y-0.5 hover:shadow-[var(--elev-2)]"
+      style={{ animationDelay: `${animDelayMs}ms`, breakInside: "avoid" }}
     >
       <div
-        className={`absolute inset-y-3 left-0 w-1.5 rounded-full bg-gradient-to-b ${ui.stripe} opacity-90`}
+        className={`absolute inset-y-3 left-0 w-1.5 rounded-full bg-gradient-to-b ${ui.stripe} opacity-90 print:opacity-100`}
         aria-hidden
       />
       <div className="relative pl-6 pr-5 pb-5 pt-5 sm:pl-7 sm:pr-6 sm:pt-6">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--background)] text-lg shadow-inner"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--card)] to-[var(--background)] text-[var(--accent)] shadow-inner ring-1 ring-[var(--line)]"
             aria-hidden
           >
-            {ui.emoji}
+            <KindGlyph kind={item.kind} className="size-5" />
           </span>
           <span
             className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${ui.chip}`}
@@ -133,6 +128,10 @@ export default function RoadmapPage() {
     [profile]
   );
 
+  const totalCards = roadmap
+    ? roadmap.phases.reduce((n, p) => n + p.opportunities.length, 0)
+    : 0;
+
   const showToast = useCallback((msg: string) => {
     setToast(msg);
     window.setTimeout(() => setToast(null), 2800);
@@ -145,9 +144,13 @@ export default function RoadmapPage() {
       await navigator.clipboard.writeText(text);
       showToast("Copied! Paste into Notes, Google Docs, or an email.");
     } catch {
-      showToast("Couldn’t copy—try selecting text manually.");
+      showToast("Could not copy. Try selecting text manually.");
     }
   }, [profile, roadmap, showToast]);
+
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
 
   const handleClear = useCallback(() => {
     if (
@@ -169,36 +172,50 @@ export default function RoadmapPage() {
         {toast && (
           <div
             role="status"
-            className="fabric-fade-up fixed bottom-6 left-1/2 z-[60] max-w-[min(90vw,24rem)] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-center text-sm font-medium text-[var(--foreground)] shadow-xl"
+            className="print:hidden fabric-fade-up fixed bottom-6 left-1/2 z-[60] max-w-[min(90vw,24rem)] -translate-x-1/2 rounded-2xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-center text-sm font-medium text-[var(--foreground)] shadow-xl"
           >
             {toast}
           </div>
         )}
 
         {!profile || !roadmap ? (
-          <div className="relative overflow-hidden rounded-[2rem] border border-dashed border-[var(--accent)]/40 bg-[var(--card)]/90 p-12 text-center shadow-lg">
+          <div className="relative overflow-hidden rounded-[2rem] border border-dashed border-[var(--accent)]/45 bg-[var(--card)]/95 p-12 text-center shadow-[var(--elev-1)]">
             <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[var(--accent-soft)] blur-3xl dark:opacity-40" />
-            <p className="text-5xl" aria-hidden>
-              🗺️
-            </p>
-            <h1 className="font-display mt-6 text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
-              Your roadmap isn&apos;t here yet
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[var(--accent-soft)]/70 text-[var(--accent)]">
+              <IconMap className="size-10" aria-hidden />
+            </div>
+            <h1 className="font-display mt-8 text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
+              Your roadmap is not here yet
             </h1>
-            <p className="mx-auto mt-3 max-w-md text-[var(--muted)] leading-relaxed">
-              Tell us about your goals once—we save your answers on{" "}
-              <strong className="text-[var(--foreground)]/90">this device</strong> (even if you
-              refresh or open a new tab).
+            <p className="mx-auto mt-4 max-w-md text-[var(--muted)] leading-relaxed">
+              Tell us about your goals once. We save your answers on{" "}
+              <strong className="font-medium text-[var(--foreground)]/90">this device</strong>, even
+              if you refresh or open a new tab.
             </p>
             <Link
               href="/onboarding"
-              className="mt-8 inline-flex rounded-full bg-[var(--accent)] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-[var(--accent)]/25 transition hover:brightness-110"
+              className="mt-10 inline-flex rounded-full bg-[var(--accent)] px-9 py-4 text-sm font-bold text-white shadow-[var(--elev-2)] transition hover:brightness-110"
             >
               Start the questionnaire
             </Link>
           </div>
         ) : (
           <>
-            <div className="fabric-fade-up flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="fabric-panel fabric-fade-up mb-8 flex flex-wrap items-center justify-center gap-4 px-5 py-4 print:hidden sm:justify-between">
+              <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-[var(--muted)]">
+                <span className="rounded-full bg-[var(--background)] px-3 py-1 font-semibold text-[var(--foreground)] ring-1 ring-[var(--line)]">
+                  {roadmap.phases.length} phases
+                </span>
+                <span className="rounded-full bg-[var(--background)] px-3 py-1 font-semibold text-[var(--foreground)] ring-1 ring-[var(--line)]">
+                  {totalCards} moves
+                </span>
+              </div>
+              <p className="text-center text-xs text-[var(--muted)] sm:text-right">
+                Tip: use Print to save a PDF, or Copy to paste anywhere.
+              </p>
+            </div>
+
+            <div className="fabric-fade-up flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
               <div className="relative text-center sm:flex-1 sm:text-left">
                 <div className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-[var(--gold-soft)] blur-3xl dark:opacity-25" />
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
@@ -209,14 +226,21 @@ export default function RoadmapPage() {
                 </h1>
                 {profile.nickname && (
                   <p className="mt-2 text-lg font-medium text-[var(--muted)]">
-                    Hey {profile.nickname} — here&apos;s a path that matches what you shared.
+                    Hey {profile.nickname}, here is a path that matches what you shared.
                   </p>
                 )}
                 <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:mx-0">
                   {roadmap.tradeoffSummary}
                 </p>
               </div>
-              <div className="flex flex-shrink-0 flex-wrap justify-center gap-2 sm:justify-end">
+              <div className="print:hidden flex flex-shrink-0 flex-wrap justify-center gap-2 sm:justify-end">
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-5 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                >
+                  Print / PDF
+                </button>
                 <button
                   type="button"
                   onClick={handleCopy}
@@ -236,15 +260,18 @@ export default function RoadmapPage() {
 
             {roadmap.flags.length > 0 && (
               <div
-                className="fabric-fade-up mt-10 rounded-3xl border border-amber-400/40 bg-gradient-to-br from-amber-50 to-orange-50/80 p-5 dark:from-amber-950/40 dark:to-orange-950/20 dark:border-amber-800/50"
+                className="fabric-fade-up fabric-panel mt-10 border-amber-400/35 bg-gradient-to-br from-amber-50/95 to-orange-50/90 p-5 dark:from-amber-950/35 dark:to-orange-950/20 dark:border-amber-800/40"
                 style={{ animationDelay: "60ms" }}
               >
                 <p className="flex items-center gap-2 text-sm font-bold text-amber-900 dark:text-amber-200">
-                  <span aria-hidden>👋</span> Quick heads-up
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100/80 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+                    <IconAlert className="size-4" aria-hidden />
+                  </span>
+                  Quick heads-up
                 </p>
                 <ul className="mt-3 space-y-2 text-sm leading-relaxed text-amber-950/90 dark:text-amber-100/90">
                   {roadmap.flags.map((f) => (
-                    <li key={f} className="flex gap-2">
+                    <li key={f} className="flex gap-2 pl-1">
                       <span className="text-amber-600 dark:text-amber-400">•</span>
                       {f}
                     </li>
@@ -253,18 +280,21 @@ export default function RoadmapPage() {
               </div>
             )}
 
-            <div className="relative mt-16">
+            <div className="relative mt-16 print:mt-8">
               <div
-                className="absolute left-[1.125rem] top-4 bottom-4 w-px bg-gradient-to-b from-[var(--accent)] via-[var(--sage)] to-violet-400 opacity-40 sm:left-8"
+                className="absolute left-[1.125rem] top-4 bottom-4 w-px bg-gradient-to-b from-[var(--accent)] via-[var(--sage)] to-violet-400 opacity-40 print:hidden sm:left-8"
                 aria-hidden
               />
 
-              <div className="space-y-20 sm:space-y-24">
+              <div className="space-y-20 sm:space-y-24 print:space-y-10">
                 {roadmap.phases.map((phase, i) => {
                   const decor = phaseDecor[i] ?? phaseDecor[0];
                   return (
-                    <section key={phase.id} className="relative pl-12 sm:pl-20">
-                      <div className="absolute left-0 top-0 sm:left-3">
+                    <section
+                      key={phase.id}
+                      className="relative pl-12 sm:pl-20 print:pl-0 print:sm:pl-0"
+                    >
+                      <div className="absolute left-0 top-0 print:hidden sm:left-3">
                         <div
                           className={`relative flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--card)] text-sm font-bold text-[var(--foreground)] shadow-lg ring-2 ring-[var(--accent)]/30 sm:h-12 sm:w-12 sm:text-base`}
                         >
@@ -276,14 +306,14 @@ export default function RoadmapPage() {
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                        <h2 className="font-display text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
+                      <div className="flex flex-col gap-2 print:mb-4 sm:flex-row sm:items-end sm:justify-between">
+                        <h2 className="font-display text-2xl font-semibold text-[var(--foreground)] sm:text-3xl print:text-xl">
                           {phase.label}
                         </h2>
                         <p className="text-sm font-medium text-[var(--muted)]">{phase.window}</p>
                       </div>
 
-                      <div className="mt-8 grid gap-5 md:grid-cols-2">
+                      <div className="mt-8 grid gap-5 md:grid-cols-2 print:grid-cols-1">
                         {phase.opportunities.map((o, oi) => (
                           <OpportunityCard
                             key={o.id}
@@ -298,9 +328,9 @@ export default function RoadmapPage() {
               </div>
             </div>
 
-            <div className="mt-16 flex flex-col items-center justify-between gap-4 rounded-3xl border border-[var(--line)] bg-[var(--card)]/80 p-6 text-center sm:flex-row sm:text-left">
+            <div className="print:hidden mt-16 flex flex-col items-center justify-between gap-4 rounded-3xl border border-[var(--line)] bg-[var(--card)]/80 p-6 text-center shadow-[var(--elev-1)] sm:flex-row sm:text-left">
               <p className="max-w-md text-sm text-[var(--muted)]">
-                Life changes—so should this plan. Tweak your answers anytime and we&apos;ll redraw
+                Life changes, so should this plan. Tweak your answers anytime and we will redraw
                 the map.
               </p>
               <Link

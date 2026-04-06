@@ -40,7 +40,7 @@ export interface FabricOpportunity {
   kind: OpportunityKind;
   title: string;
   summary: string;
-  /** Why this showed up — core "explainability" surface */
+  /** Why this showed up (explainability for the student). */
   because: string[];
   /** Rough effort hint */
   effort: "light" | "moderate" | "heavy";

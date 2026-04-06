@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Opportunity Fabric — a student roadmap with clear reasons behind every step.";
+export const alt =
+  "Opportunity Fabric: a student roadmap with clear reasons behind every step.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -15,7 +16,7 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(145deg, #f7f4ef 0%, #fde8e3 42%, #e8f0ef 100%)",
+          background: "linear-gradient(145deg, #f4f0e8 0%, #f5e0da 40%, #dfecea 100%)",
           fontFamily:
             'ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
@@ -24,7 +25,7 @@ export default function OpenGraphImage() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 20,
+            gap: 22,
             marginBottom: 28,
           }}
         >
@@ -33,14 +34,14 @@ export default function OpenGraphImage() {
               width: 64,
               height: 64,
               borderRadius: 16,
-              background: "#c45c3e",
+              background: "#b8452f",
             }}
           />
           <span
             style={{
-              fontSize: 58,
+              fontSize: 56,
               fontWeight: 700,
-              color: "#1c1917",
+              color: "#141210",
               letterSpacing: -2,
             }}
           >
@@ -49,14 +50,14 @@ export default function OpenGraphImage() {
         </div>
         <div
           style={{
-            fontSize: 32,
-            color: "#57534e",
-            maxWidth: 860,
+            fontSize: 30,
+            color: "#5c5854",
+            maxWidth: 880,
             textAlign: "center",
             lineHeight: 1.4,
           }}
         >
-          One story. A plan that fits—with plain-English reasons on every step.
+          One story. A plan that fits. Plain-English reasons on every step.
         </div>
       </div>
     ),

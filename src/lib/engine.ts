@@ -18,7 +18,7 @@ function incomeBecause(need: boolean, priority: IncomePriority): string[] {
   if (!need) return ["You said income isn’t the main driver right now, so we lean into learning."];
   if (priority === "high") {
     return [
-      "You told us paid work is urgent—we prioritize jobs and roles that fit around classes.",
+      "You told us paid work is urgent, so we prioritize jobs and roles that fit around classes.",
       "We skip suggestions that pile on unpaid work on top of a packed job schedule.",
     ];
   }
@@ -28,7 +28,7 @@ function incomeBecause(need: boolean, priority: IncomePriority): string[] {
       "We mix paid work with one or two high-impact projects or clubs.",
     ];
   }
-  return ["Income is nice-to-have for you—we focus on depth and skills first."];
+  return ["Income is nice-to-have for you. We focus on depth and skills first."];
 }
 
 function hoursCap(h: WeeklyHours): number {
@@ -94,9 +94,9 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
       kind: "experience",
       title: "Practice how products actually get built",
       summary:
-        "Pick a few apps you use—write what you’d fix first. Talk to 10 students about a campus annoyance and sketch a simple solution.",
+        "Pick a few apps you use. Write what you’d fix first. Talk to 10 students about a campus annoyance and sketch a simple solution.",
       because: [
-        "Product roles reward curiosity, prioritization, and talking to real people—not buzzwords.",
+        "Product roles reward curiosity, prioritization, and talking to real people, not buzzwords.",
       ],
       effort: "moderate",
     });
@@ -110,7 +110,7 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
       summary:
         "Practice structured problem-solving out loud, refresh mental math, and record yourself on two mock interviews a month.",
       because: [
-        "Consulting interviews move fast—they’re testing how you think and communicate under pressure.",
+        "Consulting interviews move fast. They’re testing how you think and communicate under pressure.",
       ],
       effort: "heavy",
     });
@@ -124,7 +124,7 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
       summary:
         "Try a small replication or deep read of one paper, write a short ‘here’s what’s missing’ memo, and bring it to a professor or lab contact.",
       because: [
-        "Research paths love proof you enjoy chasing questions—not just checking boxes.",
+        "Research paths love proof you enjoy chasing questions, not just checking boxes.",
       ],
       effort: "heavy",
     });
@@ -150,7 +150,7 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
       kind: "portfolio",
       title: "Tell stories in your portfolio",
       summary:
-        "Three case studies beats thirty thumbnails: problem, constraints, messy middle, final outcome—and what you’d do differently.",
+        "Three case studies beats thirty thumbnails: problem, constraints, messy middle, final outcome, plus what you’d do differently.",
       because: [
         "Design hiring is portfolio-first; process sketches show you’re ready to collaborate.",
       ],
@@ -178,7 +178,7 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
       kind: "job_search",
       title: "Hunt for jobs that teach you something",
       summary:
-        "Look for campus roles where you’ll leave with stories—helping with data, websites, events—not only hours on a time clock.",
+        "Look for campus roles where you’ll leave with stories: helping with data, websites, events, not only hours on a time clock.",
       because: incomeBecause(true, "high"),
       effort: "moderate",
     });
@@ -218,8 +218,8 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
         because: [
           "Warm intros beat cold emails; small chats add up faster than you think.",
           profile.remoteOk
-            ? "You’re open to remote—Zoom coffees and recorded talks count."
-            : "You like in-person—prioritize office hours, club events, and campus panels.",
+            ? "You’re open to remote, so Zoom coffees and recorded talks count."
+            : "You like in-person, so prioritize office hours, club events, and campus panels.",
         ],
         effort: "light",
       },
@@ -238,8 +238,8 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
         because: [
           "Depth beats a dozen one-off memberships when someone asks ‘what did you actually do?’",
           profile.weeklyHours === "under_10"
-            ? "You don’t have tons of spare hours—we keep the list short on purpose."
-            : "You’ve got bandwidth—we can layer a couple of tracks if you want.",
+            ? "You don’t have tons of spare hours, so we keep the list short on purpose."
+            : "You’ve got bandwidth, so we can layer a couple of tracks if you want.",
         ],
         effort: "moderate",
       },
@@ -268,7 +268,7 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
       summary:
         "Write down what you care about: learning, manager vibe, commute, growth. Rank them before you decide.",
       because: [
-        `You’re on track for class of ${profile.gradYear}—align summer or full-time timing with what you said matters to you.`,
+        `You’re on track for class of ${profile.gradYear}. Align summer or full-time timing with what you said matters to you.`,
       ],
       effort: "light",
     },
@@ -298,17 +298,17 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
   const flags: string[] = [];
   if (profile.visaSensitive) {
     flags.push(
-      "Run any internship or off-campus work past your international office or advisor—rules change and it’s worth a quick check."
+      "Run any internship or off-campus work past your international office or advisor. Rules change, and it’s worth a quick check."
     );
   }
   if (profile.weeklyHours === "under_10") {
     flags.push(
-      "You don’t have much time outside class—we kept this roadmap short so you can protect one thing you’ll be proud of."
+      "You don’t have much time outside class, so we kept this roadmap short so you can protect one thing you’ll be proud of."
     );
   }
   if (profile.needIncome && profile.incomePriority === "high") {
     flags.push(
-      "Paid work is a big factor for you—favor jobs with clear hours and paperwork over vague unpaid ‘exposure’ gigs."
+      "Paid work is a big factor for you, so favor jobs with clear hours and paperwork over vague unpaid ‘exposure’ gigs."
     );
   }
 
@@ -316,8 +316,8 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
     profile.weeklyHours === "under_10"
       ? "With limited spare time, we’re nudging you toward one flagship project or role instead of juggling ten half-efforts."
       : profile.needIncome && profile.incomePriority === "high"
-        ? "Because steady pay matters, we’re weighing jobs earlier—even if that means fewer ‘just for fun’ extras this term."
-        : "You’ve got some flexibility—we’re okay with a few parallel experiments as long as one of them shows clear progress.";
+        ? "Because steady pay matters, we’re weighing jobs earlier, even if that means fewer ‘just for fun’ extras this term."
+        : "You’ve got some flexibility. We’re okay with a few parallel experiments as long as one of them shows clear progress.";
 
   return {
     headline:

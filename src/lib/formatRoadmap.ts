@@ -5,8 +5,8 @@ export function roadmapToPlainText(
   roadmap: RoadmapResult
 ): string {
   const lines: string[] = [];
-  lines.push("Opportunity Fabric — my roadmap");
-  lines.push("—".repeat(40));
+  lines.push("Opportunity Fabric: my roadmap");
+  lines.push("=".repeat(42));
   lines.push(roadmap.headline);
   if (profile.nickname) lines.push(`For: ${profile.nickname}`);
   lines.push("");
@@ -20,7 +20,7 @@ export function roadmapToPlainText(
   }
 
   roadmap.phases.forEach((phase) => {
-    lines.push(`${phase.label} — ${phase.window}`);
+    lines.push(`${phase.label}  |  ${phase.window}`);
     lines.push("");
     phase.opportunities.forEach((o) => {
       lines.push(`• ${o.title}`);

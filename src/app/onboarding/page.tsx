@@ -59,17 +59,20 @@ export default function OnboardingPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content" className="mx-auto max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
-        <div className="rounded-[2rem] border border-[var(--line)] bg-[var(--card)]/90 p-8 shadow-lg backdrop-blur-sm sm:p-10">
+      <main
+        id="main-content"
+        className="relative mx-auto max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14 xl:grid xl:grid-cols-[minmax(0,1.1fr)_minmax(280px,360px)] xl:items-start xl:gap-14"
+      >
+        <div className="fabric-panel relative z-[1] mx-auto w-full max-w-2xl p-8 shadow-[var(--elev-1)] sm:p-10 xl:mx-0 xl:max-w-none">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
-            Step 1 of 1
+            Your profile
           </p>
           <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl">
             Let&apos;s sketch your next chapter
           </h1>
           <p className="mt-3 text-[var(--muted)] leading-relaxed">
-            No wrong answers. We use this to shape a visual roadmap—classes, jobs, clubs, and
-            other moves—with short explanations for each idea.
+            No wrong answers. We use this to shape a visual roadmap: classes, jobs, clubs, and
+            other moves, each with short explanations for every idea.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-10 space-y-10">
@@ -125,7 +128,7 @@ export default function OnboardingPage() {
                 Anything else we should know?
               </span>
               <span className="block text-xs text-[var(--muted)]">
-                Interests, identity, constraints—whatever helps paint the picture.
+                Interests, identity, constraints: whatever helps paint the picture.
               </span>
               <textarea
                 value={focusNotes}
@@ -209,10 +212,10 @@ export default function OnboardingPage() {
                     className={inputClass}
                   >
                     <option value="low">
-                      Lower — I can take unpaid roles if they really help my résumé
+                      Lower: I can take unpaid roles if they really help my résumé
                     </option>
                     <option value="medium">Balanced</option>
-                    <option value="high">High — my job schedule comes first</option>
+                    <option value="high">High: my job schedule comes first</option>
                   </select>
                 </label>
               )}
@@ -255,6 +258,32 @@ export default function OnboardingPage() {
             </p>
           </form>
         </div>
+
+        <aside className="relative mt-12 hidden xl:mt-0 xl:block">
+          <div className="fabric-hero-ring -right-8 top-0 h-64 w-64 opacity-35" />
+          <div className="fabric-panel sticky top-28 space-y-5 p-7 shadow-[var(--elev-1)]">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
+              What you get next
+            </p>
+            <h2 className="font-display text-xl font-semibold text-[var(--foreground)]">
+              A roadmap you can actually use
+            </h2>
+            <ul className="space-y-3 text-sm leading-relaxed text-[var(--muted)]">
+              <li className="flex gap-2">
+                <span className="font-bold text-[var(--accent)]">1.</span>
+                Phased moves from &ldquo;start here&rdquo; through &ldquo;finish strong.&rdquo;
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-[var(--accent)]">2.</span>
+                Plain-language reasons on every card.
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-[var(--accent)]">3.</span>
+                Copy, print, or reset anytime. Data stays on this device.
+              </li>
+            </ul>
+          </div>
+        </aside>
       </main>
     </>
   );
