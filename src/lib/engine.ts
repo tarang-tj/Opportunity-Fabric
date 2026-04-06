@@ -9,32 +9,26 @@ import type {
 } from "./types";
 
 function phaseWindow(gradYear: number, offset: 0 | 1 | 2): string {
-  const labels = [
-    `Near term (targeting graduation ${gradYear})`,
-    `Next phase (${gradYear})`,
-    `Exit velocity toward ${gradYear}`,
-  ];
-  return labels[offset];
+  if (offset === 0) return `Your next few months · class of ${gradYear}`;
+  if (offset === 1) return `After that · still aiming at ${gradYear}`;
+  return `Nearing graduation (${gradYear}) · time to lock things in`;
 }
 
-function incomeBecause(
-  need: boolean,
-  priority: IncomePriority
-): string[] {
-  if (!need) return ["You indicated income is not a primary constraint right now."];
+function incomeBecause(need: boolean, priority: IncomePriority): string[] {
+  if (!need) return ["You said income isn’t the main driver right now, so we lean into learning."];
   if (priority === "high") {
     return [
-      "Income is marked high priority — we front-load paid, legible experiences.",
-      "We avoid suggesting unpaid stacks that compete with work-study hours.",
+      "You told us paid work is urgent—we prioritize jobs and roles that fit around classes.",
+      "We skip suggestions that pile on unpaid work on top of a packed job schedule.",
     ];
   }
   if (priority === "medium") {
     return [
-      "Income matters, but not at the expense of every exploratory project.",
-      "We mix paid roles with high-leverage unpaid proof-of-skill work.",
+      "Money matters to you, but you still have room for a few unpaid “résumé builders.”",
+      "We mix paid work with one or two high-impact projects or clubs.",
     ];
   }
-  return ["Income is optional in your profile — we bias toward skill depth first."];
+  return ["Income is nice-to-have for you—we focus on depth and skills first."];
 }
 
 function hoursCap(h: WeeklyHours): number {
@@ -43,16 +37,17 @@ function hoursCap(h: WeeklyHours): number {
   return 5;
 }
 
+/** Student-facing label for headlines and copy */
 function goalLabel(g: PrimaryGoal): string {
   const map: Record<PrimaryGoal, string> = {
-    software_engineering: "Software engineering",
-    data_analytics: "Data analytics",
-    product_management: "Product management",
-    consulting: "Consulting",
-    healthcare: "Healthcare / pre-clinical",
-    research_grad_school: "Research / grad school",
-    creative_design: "Creative & design",
-    exploring: "Exploration",
+    software_engineering: "software & tech",
+    data_analytics: "data & analytics",
+    product_management: "product & strategy",
+    consulting: "consulting",
+    healthcare: "healthcare",
+    research_grad_school: "research & grad school",
+    creative_design: "design & creative work",
+    exploring: "figuring things out",
   };
   return map[g];
 }
@@ -67,12 +62,12 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "da-core",
       kind: "course_strategy",
-      title: "Build an analytics spine",
+      title: "Stack skills employers actually ask about",
       summary:
-        "Sequence statistics → SQL → visualization → a capstone-style analysis project you can narrate in interviews.",
+        "Think stats → spreadsheets/SQL → charts and stories → one meaty project you can walk through in an interview (even if it’s a class assignment you polish).",
       because: [
-        `Anchored to your goal: ${goalLabel(goal)}.`,
-        "Employers hire stories + artifacts more than course titles alone.",
+        `You pointed toward ${goalLabel(goal)}.`,
+        "Interviewers remember one clear project more than a long list of half-started ones.",
       ],
       effort: "heavy",
     });
@@ -82,12 +77,12 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "se-core",
       kind: "portfolio",
-      title: "Ship one public artifact per term",
+      title: "Ship something small but real each term",
       summary:
-        "A small full-stack or API + UI project beats a long list of half-finished repos.",
+        "One app, site, or tool you can demo beats ten repos with no README. Bonus if friends can actually use it.",
       because: [
-        `Anchored to your goal: ${goalLabel(goal)}.`,
-        "Recruiters scan for maintainability, README clarity, and deployability.",
+        `You pointed toward ${goalLabel(goal)}.`,
+        "Hiring managers skim for clear explanations, clean code, and “I can run this locally.”",
       ],
       effort: "moderate",
     });
@@ -97,11 +92,11 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "pm-core",
       kind: "experience",
-      title: "Practice product judgment weekly",
+      title: "Practice how products actually get built",
       summary:
-        "Write 5 teardowns (onboarding, pricing, metrics) and run 10 user interviews for a campus problem.",
+        "Pick a few apps you use—write what you’d fix first. Talk to 10 students about a campus annoyance and sketch a simple solution.",
       because: [
-        "PM loops are discovery → prioritization → measurement — simulate that before titles.",
+        "Product roles reward curiosity, prioritization, and talking to real people—not buzzwords.",
       ],
       effort: "moderate",
     });
@@ -111,10 +106,12 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "con-core",
       kind: "networking",
-      title: "Case + communication stack",
+      title: "Build case and communication muscle",
       summary:
-        "Structured cases, mental math fluency, and 2 recorded mock interviews per month.",
-      because: ["Consulting screens communication speed and structured thinking early."],
+        "Practice structured problem-solving out loud, refresh mental math, and record yourself on two mock interviews a month.",
+      because: [
+        "Consulting interviews move fast—they’re testing how you think and communicate under pressure.",
+      ],
       effort: "heavy",
     });
   }
@@ -123,10 +120,12 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "rg-core",
       kind: "experience",
-      title: "Evidence of research taste",
+      title: "Show you can dig into a question",
       summary:
-        "Replicate a classic paper snippet, write a 2-page lit gap memo, and seek a lab conversation with that memo.",
-      because: ["Grad paths reward demonstrated curiosity and reproducibility."],
+        "Try a small replication or deep read of one paper, write a short ‘here’s what’s missing’ memo, and bring it to a professor or lab contact.",
+      because: [
+        "Research paths love proof you enjoy chasing questions—not just checking boxes.",
+      ],
       effort: "heavy",
     });
   }
@@ -135,10 +134,12 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "hc-core",
       kind: "course_strategy",
-      title: "Clarify pathway primitives",
+      title: "Pick a lane early (and know your prereqs)",
       summary:
-        "Map prereqs for your target track (clinical vs public health vs biotech) and schedule shadowing or volunteering in one lane.",
-      because: ["Healthcare paths diverge early; clarity reduces costly detours."],
+        "Sketch whether you’re leaning clinical, public health, biotech, etc. Line up prereqs and one shadow or volunteer thread in that lane.",
+      because: [
+        "Healthcare paths split quickly; knowing your lane saves you from retaking years.",
+      ],
       effort: "moderate",
     });
   }
@@ -147,10 +148,12 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "cd-core",
       kind: "portfolio",
-      title: "Tight portfolio narrative",
+      title: "Tell stories in your portfolio",
       summary:
-        "3 case studies with problem, constraints, process shots, and outcomes — not only final mocks.",
-      because: ["Design hiring is portfolio-first; process signals seniority."],
+        "Three case studies beats thirty thumbnails: problem, constraints, messy middle, final outcome—and what you’d do differently.",
+      because: [
+        "Design hiring is portfolio-first; process sketches show you’re ready to collaborate.",
+      ],
       effort: "moderate",
     });
   }
@@ -159,11 +162,11 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "visa-flag",
       kind: "campus_resource",
-      title: "Align experiences with work authorization",
+      title: "Double-check work rules before you say yes",
       summary:
-        "Book a short advising conversation before accepting unpaid work that looks like employment.",
+        "Book a quick chat with international student services or career advising before unpaid gigs that feel like a real job.",
       because: [
-        "Visa-sensitive paths need clean documentation — unpaid roles still have rules.",
+        "Some unpaid roles still have strict rules; a 15-minute check beats a stressful surprise later.",
       ],
       effort: "light",
     });
@@ -173,9 +176,9 @@ function coreTrackOps(goal: PrimaryGoal, profile: StudentProfile): FabricOpportu
     base.push({
       id: "income-priority",
       kind: "job_search",
-      title: "Campus-paid roles as skill leverage",
+      title: "Hunt for jobs that teach you something",
       summary:
-        "Target jobs that produce artifacts: data ops, IT support tickets analytics, web comms for a department.",
+        "Look for campus roles where you’ll leave with stories—helping with data, websites, events—not only hours on a time clock.",
       because: incomeBecause(true, "high"),
       effort: "moderate",
     });
@@ -198,25 +201,25 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
       {
         id: "fabric-intake",
         kind: "campus_resource",
-        title: "One intake meeting that unlocks many doors",
+        title: "Book two human conversations this month",
         summary:
-          "Career services + major advisor in the same month — ask for ‘where grads like me went’ data.",
+          "Career center + your major advisor (or a trusted faculty member). Ask where recent grads with your interests ended up.",
         because: [
-          "You only enter constraints once; we route you — human nodes still compress weeks of guessing.",
+          "People who know your school can shortcut weeks of guessing on Google.",
         ],
         effort: "light",
       },
       {
         id: "network-seed",
         kind: "networking",
-        title: "Warm intro math",
+        title: "Three low-stakes coffees a term",
         summary:
-          "Each term, 3 coffee chats: one alum, one peer ahead by a year, one faculty/mentor.",
+          "One alum, one student a year ahead, one professor or mentor. Ask what they’d do if they were you this quarter.",
         because: [
-          "Opportunity fabric is a graph problem — early edges compound.",
+          "Warm intros beat cold emails; small chats add up faster than you think.",
           profile.remoteOk
-            ? "Remote OK — we weight async intros and recorded talks."
-            : "You prefer in-person — bias events and lab/office hours.",
+            ? "You’re open to remote—Zoom coffees and recorded talks count."
+            : "You like in-person—prioritize office hours, club events, and campus panels.",
         ],
         effort: "light",
       },
@@ -229,25 +232,27 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
       {
         id: "exp-depth",
         kind: "experience",
-        title: "Depth over breadth",
+        title: "Go deep on one thing",
         summary:
-          "Double down on one society, lab, or part-time role long enough to earn a recommendation story.",
+          "Stick with one club, lab, or part-time job long enough that someone can write you a specific recommendation.",
         because: [
-          "Signals compound when duration meets responsibility.",
-          `Weekly bandwidth: ${profile.weeklyHours.replace("_", "–")} hrs shapes how many parallel bets make sense.`,
+          "Depth beats a dozen one-off memberships when someone asks ‘what did you actually do?’",
+          profile.weeklyHours === "under_10"
+            ? "You don’t have tons of spare hours—we keep the list short on purpose."
+            : "You’ve got bandwidth—we can layer a couple of tracks if you want.",
         ],
         effort: "moderate",
       },
       {
         id: "job-timeline",
         kind: "job_search",
-        title: "Recruiting calendar sync",
+        title: "Put job hunting on the calendar",
         summary:
-          "Backwards-plan applications from target start dates; set a recurring ‘pipeline review’ slot.",
+          "Work backward from when you want to start: list deadlines, set a weekly ‘applications & follow-ups’ block on your phone.",
         because: [
           profile.needIncome
-            ? "Income need means earlier employer pipeline hygiene."
-            : "Without urgent income, you can trade earlier apps for stronger artifacts.",
+            ? "Because income matters for you, starting earlier beats a last-minute scramble."
+            : "Without urgent bills, you can trade a few early apps for a stronger story on your résumé.",
         ],
         effort: "light",
       },
@@ -259,11 +264,11 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
     {
       id: "offer-negotiation",
       kind: "job_search",
-      title: "Offer comparison as design",
+      title: "Compare offers beyond the paycheck",
       summary:
-        "Model cash, growth, manager quality, and learning rate — not title alone.",
+        "Write down what you care about: learning, manager vibe, commute, growth. Rank them before you decide.",
       because: [
-        `Graduating ${profile.quarter} ${profile.gradYear}: align summer/full-time windows with your goal.`,
+        `You’re on track for class of ${profile.gradYear}—align summer or full-time timing with what you said matters to you.`,
       ],
       effort: "light",
     },
@@ -272,19 +277,19 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
   const phases: RoadmapPhase[] = [
     {
       id: "p0",
-      label: "This quarter",
+      label: "Start here",
       window: phaseWindow(profile.gradYear, 0),
       opportunities: nowOps,
     },
     {
       id: "p1",
-      label: "Next",
+      label: "Build momentum",
       window: phaseWindow(profile.gradYear, 1),
       opportunities: nextOps,
     },
     {
       id: "p2",
-      label: "Build toward exit velocity",
+      label: "Finish strong",
       window: phaseWindow(profile.gradYear, 2),
       opportunities: laterOps,
     },
@@ -292,24 +297,33 @@ export function buildRoadmap(profile: StudentProfile): RoadmapResult {
 
   const flags: string[] = [];
   if (profile.visaSensitive) {
-    flags.push("Visa-sensitive: validate any internship/work experience with official guidance.");
+    flags.push(
+      "Run any internship or off-campus work past your international office or advisor—rules change and it’s worth a quick check."
+    );
   }
   if (profile.weeklyHours === "under_10") {
-    flags.push("Low weekly bandwidth: roadmap is intentionally sparse — protect one flagship project.");
+    flags.push(
+      "You don’t have much time outside class—we kept this roadmap short so you can protect one thing you’ll be proud of."
+    );
   }
   if (profile.needIncome && profile.incomePriority === "high") {
-    flags.push("High income priority: prioritize paid, documented roles over speculative unpaid stacks.");
+    flags.push(
+      "Paid work is a big factor for you—favor jobs with clear hours and paperwork over vague unpaid ‘exposure’ gigs."
+    );
   }
 
   const tradeoffSummary =
     profile.weeklyHours === "under_10"
-      ? "You’re optimizing for focus: fewer parallel bets, clearer flagship outcomes."
+      ? "With limited spare time, we’re nudging you toward one flagship project or role instead of juggling ten half-efforts."
       : profile.needIncome && profile.incomePriority === "high"
-        ? "You’re trading some exploration for earlier paid signal and schedule stability."
-        : "You can run parallel experiments — keep at least one artifact that proves the goal.";
+        ? "Because steady pay matters, we’re weighing jobs earlier—even if that means fewer ‘just for fun’ extras this term."
+        : "You’ve got some flexibility—we’re okay with a few parallel experiments as long as one of them shows clear progress.";
 
   return {
-    headline: `Fabric for ${goalLabel(goal)}`,
+    headline:
+      goal === "exploring"
+        ? "Your path while you’re still exploring"
+        : `Your path toward ${goalLabel(goal)}`,
     tradeoffSummary,
     phases,
     flags,

@@ -11,16 +11,19 @@ import type {
   WeeklyHours,
 } from "@/lib/types";
 
-const GOALS: { value: PrimaryGoal; label: string }[] = [
-  { value: "software_engineering", label: "Software engineering" },
-  { value: "data_analytics", label: "Data analytics" },
-  { value: "product_management", label: "Product management" },
-  { value: "consulting", label: "Consulting" },
-  { value: "healthcare", label: "Healthcare / pre-clinical" },
-  { value: "research_grad_school", label: "Research / grad school" },
-  { value: "creative_design", label: "Creative & design" },
-  { value: "exploring", label: "Still exploring" },
+const GOALS: { value: PrimaryGoal; label: string; hint: string }[] = [
+  { value: "software_engineering", label: "Software & coding", hint: "Apps, systems, tech" },
+  { value: "data_analytics", label: "Data & analytics", hint: "Numbers, dashboards, research" },
+  { value: "product_management", label: "Product & strategy", hint: "Features, users, roadmaps" },
+  { value: "consulting", label: "Consulting", hint: "Case prep, client-style work" },
+  { value: "healthcare", label: "Healthcare", hint: "Pre-med, public health, biotech" },
+  { value: "research_grad_school", label: "Research / grad school", hint: "Labs, papers, PhD track" },
+  { value: "creative_design", label: "Design & creative", hint: "UX, visual, content" },
+  { value: "exploring", label: "I’m still figuring it out", hint: "Totally OK" },
 ];
+
+const inputClass =
+  "w-full rounded-2xl border border-[var(--line)] bg-[var(--card)] px-4 py-3 text-[var(--foreground)] outline-none transition placeholder:text-[var(--muted)]/70 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/25";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -56,188 +59,198 @@ export default function OnboardingPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-2xl flex-1 px-4 py-10 sm:px-6">
-        <p className="text-sm font-medium uppercase tracking-wider text-amber-700 dark:text-amber-400">
-          Single intake
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Map goals and constraints once
-        </h1>
-        <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-          Fabric turns this into a phased roadmap with explicit &ldquo;because&rdquo; lines—so
-          it is explainable, not mystical.
-        </p>
+      <main className="mx-auto max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="rounded-[2rem] border border-[var(--line)] bg-[var(--card)]/90 p-8 shadow-lg backdrop-blur-sm sm:p-10">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
+            Step 1 of 1
+          </p>
+          <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl">
+            Let&apos;s sketch your next chapter
+          </h1>
+          <p className="mt-3 text-[var(--muted)] leading-relaxed">
+            No wrong answers. We use this to shape a visual roadmap—classes, jobs, clubs, and
+            other moves—with short explanations for each idea.
+          </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-10 space-y-10 border-t border-zinc-200 pt-10 dark:border-zinc-800"
-        >
-          <label className="block space-y-2">
-            <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              What should we call you? (optional)
-            </span>
-            <input
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none ring-amber-500/0 transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-              placeholder="TJ"
-              autoComplete="nickname"
-            />
-          </label>
-
-          <fieldset className="space-y-3">
-            <legend className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              Primary direction
-            </legend>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {GOALS.map((g) => (
-                <label
-                  key={g.value}
-                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
-                    primaryGoal === g.value
-                      ? "border-amber-500 bg-amber-50 dark:border-amber-500/80 dark:bg-amber-950/40"
-                      : "border-zinc-200 hover:border-zinc-300 dark:border-zinc-700 dark:hover:border-zinc-600"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="goal"
-                    value={g.value}
-                    checked={primaryGoal === g.value}
-                    onChange={() => setPrimaryGoal(g.value)}
-                    className="accent-amber-600"
-                  />
-                  {g.label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <label className="block space-y-2">
-            <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              Focus notes
-            </span>
-            <textarea
-              value={focusNotes}
-              onChange={(e) => setFocusNotes(e.target.value)}
-              rows={3}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none ring-amber-500/0 transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-              placeholder="e.g. interested in climate data, first-gen, prefers small teams"
-            />
-          </label>
-
-          <div className="grid gap-6 sm:grid-cols-2">
+          <form onSubmit={handleSubmit} className="mt-10 space-y-10">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                Target graduation year
+              <span className="text-sm font-semibold text-[var(--foreground)]">
+                What should we call you?{" "}
+                <span className="font-normal text-[var(--muted)]">(optional)</span>
               </span>
               <input
-                type="number"
-                min={2025}
-                max={2040}
-                value={gradYear}
-                onChange={(e) => setGradYear(Number(e.target.value))}
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                className={inputClass}
+                placeholder="First name or nickname"
+                autoComplete="nickname"
               />
             </label>
+
+            <fieldset className="space-y-4">
+              <legend className="text-sm font-semibold text-[var(--foreground)]">
+                What direction feels closest right now?
+              </legend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {GOALS.map((g) => (
+                  <label
+                    key={g.value}
+                    className={`relative cursor-pointer rounded-2xl border-2 p-4 transition ${
+                      primaryGoal === g.value
+                        ? "border-[var(--accent)] bg-[var(--accent-soft)]/50 shadow-sm dark:bg-[var(--accent-soft)]/25"
+                        : "border-[var(--line)] bg-[var(--background)]/50 hover:border-[var(--accent)]/35"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="goal"
+                        value={g.value}
+                        checked={primaryGoal === g.value}
+                        onChange={() => setPrimaryGoal(g.value)}
+                        className="mt-1 size-4 accent-[var(--accent)]"
+                      />
+                      <div>
+                        <span className="font-medium text-[var(--foreground)]">{g.label}</span>
+                        <p className="mt-0.5 text-xs text-[var(--muted)]">{g.hint}</p>
+                      </div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                Current quarter (rough)
+              <span className="text-sm font-semibold text-[var(--foreground)]">
+                Anything else we should know?
               </span>
-              <select
-                value={quarter}
-                onChange={(e) =>
-                  setQuarter(e.target.value as StudentProfile["quarter"])
-                }
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-              >
-                <option value="winter">Winter</option>
-                <option value="spring">Spring</option>
-                <option value="summer">Summer</option>
-                <option value="fall">Fall</option>
-              </select>
-            </label>
-          </div>
-
-          <fieldset className="space-y-3">
-            <legend className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              Weekly bandwidth outside class
-            </legend>
-            <select
-              value={weeklyHours}
-              onChange={(e) => setWeeklyHours(e.target.value as WeeklyHours)}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-            >
-              <option value="under_10">Under 10 hours</option>
-              <option value="10_20">10–20 hours</option>
-              <option value="20_plus">20+ hours</option>
-            </select>
-          </fieldset>
-
-          <div className="space-y-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                checked={needIncome}
-                onChange={(e) => setNeedIncome(e.target.checked)}
-                className="size-4 accent-amber-600"
+              <span className="block text-xs text-[var(--muted)]">
+                Interests, identity, constraints—whatever helps paint the picture.
+              </span>
+              <textarea
+                value={focusNotes}
+                onChange={(e) => setFocusNotes(e.target.value)}
+                rows={3}
+                className={`${inputClass} resize-y min-h-[5.5rem]`}
+                placeholder="e.g. first-gen, care about climate, prefer small teams, commuting…"
               />
-              <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                I need income from work while in school
-              </span>
             </label>
-            {needIncome && (
-              <label className="block space-y-2 pl-7">
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                  How urgent is income vs exploration?
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-[var(--foreground)]">
+                  When do you hope to graduate?
+                </span>
+                <input
+                  type="number"
+                  min={2025}
+                  max={2040}
+                  value={gradYear}
+                  onChange={(e) => setGradYear(Number(e.target.value))}
+                  className={inputClass}
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-[var(--foreground)]">
+                  What term is it for you?
                 </span>
                 <select
-                  value={incomePriority}
+                  value={quarter}
                   onChange={(e) =>
-                    setIncomePriority(e.target.value as IncomePriority)
+                    setQuarter(e.target.value as StudentProfile["quarter"])
                   }
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+                  className={inputClass}
                 >
-                  <option value="low">Lower — I can take unpaid if it builds signal</option>
-                  <option value="medium">Balanced</option>
-                  <option value="high">High — paid work shapes my schedule</option>
+                  <option value="winter">Winter</option>
+                  <option value="spring">Spring</option>
+                  <option value="summer">Summer</option>
+                  <option value="fall">Fall</option>
                 </select>
               </label>
-            )}
-          </div>
+            </div>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                checked={remoteOk}
-                onChange={(e) => setRemoteOk(e.target.checked)}
-                className="size-4 accent-amber-600"
-              />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                Remote networking / work is OK
-              </span>
-            </label>
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                checked={visaSensitive}
-                onChange={(e) => setVisaSensitive(e.target.checked)}
-                className="size-4 accent-amber-600"
-              />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                Visa / work authorization is a constraint
-              </span>
-            </label>
-          </div>
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-semibold text-[var(--foreground)]">
+                Outside of class, how much time do you realistically have?
+              </legend>
+              <select
+                value={weeklyHours}
+                onChange={(e) => setWeeklyHours(e.target.value as WeeklyHours)}
+                className={inputClass}
+              >
+                <option value="under_10">Less than 10 hours a week</option>
+                <option value="10_20">About 10–20 hours a week</option>
+                <option value="20_plus">More than 20 hours a week</option>
+              </select>
+            </fieldset>
 
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400 sm:w-auto sm:px-8"
-          >
-            Weave my roadmap
-          </button>
-        </form>
+            <div className="space-y-4 rounded-2xl border border-[var(--line)] bg-[var(--background)]/60 p-5">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={needIncome}
+                  onChange={(e) => setNeedIncome(e.target.checked)}
+                  className="mt-1 size-4 accent-[var(--accent)]"
+                />
+                <span className="text-sm font-medium text-[var(--foreground)] leading-snug">
+                  I need to earn money while I&apos;m in school
+                </span>
+              </label>
+              {needIncome && (
+                <label className="block space-y-2 border-t border-[var(--line)] pt-4">
+                  <span className="text-sm text-[var(--muted)]">
+                    How much does paid work need to drive your choices?
+                  </span>
+                  <select
+                    value={incomePriority}
+                    onChange={(e) =>
+                      setIncomePriority(e.target.value as IncomePriority)
+                    }
+                    className={inputClass}
+                  >
+                    <option value="low">
+                      Lower — I can take unpaid roles if they really help my résumé
+                    </option>
+                    <option value="medium">Balanced</option>
+                    <option value="high">High — my job schedule comes first</option>
+                  </select>
+                </label>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-4 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 sm:flex-row sm:flex-wrap">
+              <label className="flex flex-1 cursor-pointer items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={remoteOk}
+                  onChange={(e) => setRemoteOk(e.target.checked)}
+                  className="size-4 accent-[var(--accent)]"
+                />
+                <span className="text-sm text-[var(--foreground)]">
+                  I&apos;m open to remote chats, events, or work
+                </span>
+              </label>
+              <label className="flex flex-1 cursor-pointer items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={visaSensitive}
+                  onChange={(e) => setVisaSensitive(e.target.checked)}
+                  className="size-4 accent-[var(--accent)]"
+                />
+                <span className="text-sm text-[var(--foreground)]">
+                  My visa or work permission needs extra care
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full rounded-full bg-[var(--accent)] py-4 text-sm font-bold text-white shadow-lg shadow-[var(--accent)]/30 transition hover:brightness-110 sm:w-auto sm:px-12"
+            >
+              Show me my roadmap →
+            </button>
+          </form>
+        </div>
       </main>
     </>
   );
