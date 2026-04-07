@@ -87,6 +87,13 @@ export default function RoadmapPage() {
   const pct =
     counts.total > 0 ? Math.round((counts.done / counts.total) * 100) : 0;
 
+  const firstPhasePreview = useMemo(() => {
+    if (!roadmap?.phases.length) return [];
+    return roadmap.phases[0]!.opportunities.slice(0, 4);
+  }, [roadmap]);
+
+  const firstPhaseId = roadmap?.phases[0]?.id ?? "";
+
   const showToast = useCallback((msg: string) => {
     setToast(msg);
     window.setTimeout(() => setToast(null), 2800);
@@ -175,7 +182,10 @@ export default function RoadmapPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content" className="mx-auto max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
+      <main
+        id="main-content"
+        className="mx-auto max-w-5xl flex-1 px-4 py-10 pb-20 sm:px-6 sm:py-14 sm:pb-24"
+      >
         {toast && (
           <div
             role="status"
@@ -209,23 +219,43 @@ export default function RoadmapPage() {
         ) : (
           <>
             <div className="fabric-panel fabric-fade-up mb-6 print:hidden">
-              <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
-                    Your momentum
-                  </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <span className="text-2xl font-bold text-[var(--foreground)]">{pct}%</span>
-                    <span className="text-sm text-[var(--muted)]">
-                      {counts.done} of {counts.total} moves marked done
-                      {counts.working > 0 ? ` · ${counts.working} in progress` : ""}
-                    </span>
+              <div className="flex flex-col gap-4 px-5 py-4">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+                      Your momentum
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-3">
+                      <span className="text-2xl font-bold tabular-nums text-[var(--foreground)]">
+                        {pct}%
+                      </span>
+                      <span className="text-sm text-[var(--muted)]">
+                        {counts.done} of {counts.total} moves marked done
+                        {counts.working > 0 ? ` · ${counts.working} in progress` : ""}
+                      </span>
+                    </div>
                   </div>
+                  {pct === 0 && counts.total > 0 && (
+                    <p className="max-w-[14rem] text-right text-xs leading-snug text-[var(--muted)]">
+                      Check a card below as <span className="font-semibold text-[var(--foreground)]/80">Done</span>{" "}
+                      when you finish it — the bar fills as you go.
+                    </p>
+                  )}
                 </div>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--line)] sm:max-w-xs sm:flex-none">
+                <div
+                  className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--foreground)]/[0.08] ring-1 ring-inset ring-[var(--foreground)]/[0.06] dark:bg-[var(--foreground)]/[0.12] dark:ring-[var(--foreground)]/[0.08]"
+                  role="progressbar"
+                  aria-valuenow={pct}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Roadmap progress, ${counts.done} of ${counts.total} moves done`}
+                >
                   <div
-                    className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
-                    style={{ width: `${pct}%` }}
+                    className="h-full rounded-full bg-[var(--accent)] shadow-sm shadow-[var(--accent)]/25 transition-[width] duration-500 ease-out"
+                    style={{
+                      width: `${pct}%`,
+                      minWidth: pct > 0 ? "0.5rem" : undefined,
+                    }}
                   />
                 </div>
               </div>
@@ -240,10 +270,44 @@ export default function RoadmapPage() {
                   {totalCards} moves
                 </span>
               </div>
-              <p className="text-center text-xs text-[var(--muted)] sm:text-right">
-                Check off cards as you go. Progress saves on this device.
-              </p>
+              <div className="flex flex-col items-center gap-2 sm:items-end">
+                <p className="text-center text-xs text-[var(--muted)] sm:text-right">
+                  Check off cards as you go. Progress saves on this device.
+                </p>
+                <a
+                  href="#roadmap-moves"
+                  className="text-center text-xs font-bold text-[var(--accent)] underline decoration-[var(--accent)]/35 underline-offset-4 transition hover:decoration-[var(--accent)] sm:text-right"
+                >
+                  Jump to your moves ↓
+                </a>
+              </div>
             </div>
+
+            {firstPhasePreview.length > 0 && (
+              <div className="fabric-panel fabric-fade-up mb-8 p-5 print:hidden">
+                <p className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
+                  What&apos;s next
+                </p>
+                <p className="mt-1 text-sm text-[var(--muted)]">
+                  First items in <span className="font-medium text-[var(--foreground)]/90">phase 1</span> — open a card to mark progress.
+                </p>
+                <ul className="mt-4 space-y-2">
+                  {firstPhasePreview.map((o) => (
+                    <li key={o.id}>
+                      <a
+                        href={`#move-${o.id}`}
+                        className="group flex items-start gap-2 text-sm font-medium text-[var(--foreground)] transition hover:text-[var(--accent)]"
+                      >
+                        <span className="mt-0.5 text-[var(--accent)] opacity-70 transition group-hover:opacity-100">
+                          →
+                        </span>
+                        <span className="leading-snug">{o.title}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="fabric-fade-up flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
               <div className="relative text-center sm:flex-1 sm:text-left">
@@ -309,7 +373,7 @@ export default function RoadmapPage() {
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="rounded-full px-4 py-2.5 text-sm font-semibold text-[var(--muted)] underline-offset-4 hover:text-[var(--accent)] hover:underline"
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-transparent px-4 py-2.5 text-sm font-bold text-[var(--muted)] transition hover:border-red-500/40 hover:text-red-700 dark:hover:text-red-300"
                 >
                   Clear all
                 </button>
@@ -377,7 +441,11 @@ export default function RoadmapPage() {
               </div>
             )}
 
-            <div className="relative mt-16 print:mt-8">
+            <div
+              id="roadmap-moves"
+              className="relative scroll-mt-28 mt-10 print:mt-8 sm:scroll-mt-32"
+            >
+              <h2 className="sr-only">Your phased moves</h2>
               <div
                 className="absolute left-[1.125rem] top-4 bottom-4 w-px bg-gradient-to-b from-[var(--accent)] via-[var(--sage)] to-violet-400 opacity-40 print:hidden sm:left-8"
                 aria-hidden
@@ -389,7 +457,8 @@ export default function RoadmapPage() {
                   return (
                     <section
                       key={phase.id}
-                      className="relative pl-12 sm:pl-20 print:pl-0 print:sm:pl-0"
+                      id={i === 0 && firstPhaseId ? `phase-${firstPhaseId}` : undefined}
+                      className="relative scroll-mt-28 pl-12 sm:scroll-mt-32 sm:pl-20 print:pl-0 print:sm:pl-0"
                     >
                       <div className="absolute left-0 top-0 print:hidden sm:left-3">
                         <div
@@ -412,8 +481,12 @@ export default function RoadmapPage() {
 
                       <div className="mt-8 grid gap-5 md:grid-cols-2 print:grid-cols-1">
                         {phase.opportunities.map((o, oi) => (
-                          <OpportunityRoadmapCard
+                          <div
                             key={o.id}
+                            id={`move-${o.id}`}
+                            className="scroll-mt-28 sm:scroll-mt-32"
+                          >
+                          <OpportunityRoadmapCard
                             item={o}
                             animDelayMs={80 + i * 140 + oi * 60}
                             done={progress.doneIds.includes(o.id)}
@@ -421,6 +494,7 @@ export default function RoadmapPage() {
                             onToggleDone={() => onToggleDone(o.id)}
                             onToggleWorking={() => onToggleWorking(o.id)}
                           />
+                          </div>
                         ))}
                       </div>
                     </section>
