@@ -84,6 +84,12 @@ export default function PlansPage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={`/plans/compare?a=${encodeURIComponent(plan.id)}`}
+                    className="rounded-full border border-[var(--line)] px-5 py-2.5 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--accent)]/45 hover:text-[var(--accent)]"
+                  >
+                    Compare from here
+                  </Link>
                   <button
                     type="button"
                     onClick={() => loadPlan(plan)}
