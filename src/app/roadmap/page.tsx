@@ -309,25 +309,25 @@ export default function RoadmapPage() {
               </div>
             )}
 
-            <div className="fabric-fade-up flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-              <div className="relative text-center sm:flex-1 sm:text-left">
+            <div className="fabric-fade-up">
+              <div className="relative w-full text-center sm:text-left">
                 <div className="pointer-events-none absolute -left-24 top-0 h-48 w-48 rounded-full bg-[var(--gold-soft)] blur-3xl dark:opacity-25" />
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
                   Your personalized roadmap
                 </p>
-                <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
+                <h1 className="font-display mx-auto mt-3 max-w-none text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:mx-0 sm:text-4xl lg:text-[2.75rem] lg:leading-[1.12]">
                   {roadmap.headline}
                 </h1>
                 {profile.nickname && (
-                  <p className="mt-2 text-lg font-medium text-[var(--muted)]">
+                  <p className="mx-auto mt-2 max-w-4xl text-lg font-medium text-[var(--muted)] sm:mx-0">
                     Hey {profile.nickname}, here is a path that matches what you shared.
                   </p>
                 )}
-                <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:mx-0">
+                <p className="mx-auto mt-5 max-w-4xl text-base leading-relaxed text-[var(--muted)] sm:mx-0 lg:text-lg">
                   {roadmap.tradeoffSummary}
                 </p>
               </div>
-              <div className="print:hidden flex flex-shrink-0 flex-wrap justify-center gap-2 sm:justify-end">
+              <div className="print:hidden mt-8 flex w-full flex-wrap justify-center gap-2 border-t border-[var(--line)] pt-6 sm:justify-end">
                 <button
                   type="button"
                   onClick={handlePrint}
@@ -410,7 +410,7 @@ export default function RoadmapPage() {
             )}
 
             {insights.length > 0 && (
-              <div className="fabric-panel fabric-fade-up mt-8 p-6 print:hidden">
+              <div className="fabric-panel fabric-fade-up mt-6 p-6 print:hidden">
                 <p className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
                   Fabric read on your inputs
                 </p>
@@ -529,4 +529,15 @@ export default function RoadmapPage() {
                 </Link>
                 <Link
                   href="/import"
-                  clas
+                  className="rounded-full border-2 border-[var(--foreground)]/15 px-6 py-3 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/50"
+                >
+                  Preview .md file
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
+      </main>
+    </>
+  );
+}
