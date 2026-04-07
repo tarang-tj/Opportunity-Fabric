@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+const footerLinkClass =
+  "text-[var(--muted)] underline-offset-4 hover:text-[var(--foreground)] hover:underline";
+
 export function SiteFooter() {
   return (
     <footer className="print:hidden mt-auto border-t border-[var(--line)] bg-[var(--card)]/60 py-12 backdrop-blur-md">
@@ -21,18 +24,22 @@ export function SiteFooter() {
           >
             Your profile
           </Link>
-          <Link
-            href="/roadmap"
-            className="text-[var(--muted)] underline-offset-4 hover:text-[var(--foreground)] hover:underline"
-          >
+          <Link href="/roadmap" className={footerLinkClass}>
             My roadmap
           </Link>
-          <Link
-            href="/mentor"
-            className="text-[var(--muted)] underline-offset-4 hover:text-[var(--foreground)] hover:underline"
-          >
+          <Link href="/mentor" className={footerLinkClass}>
             Mentor summary
           </Link>
           <a
             href="https://github.com/tarang-tj/Opportunity-Fabric"
-            className="text-[var(--muted)] underline-offset-4
+            className={footerLinkClass}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}
