@@ -27,16 +27,12 @@ export function SiteFooter() {
           >
             My roadmap
           </Link>
+          <Link
+            href="/mentor"
+            className="text-[var(--muted)] underline-offset-4 hover:text-[var(--foreground)] hover:underline"
+          >
+            Mentor summary
+          </Link>
           <a
             href="https://github.com/tarang-tj/Opportunity-Fabric"
-            className="text-[var(--muted)] underline-offset-4 hover:text-[var(--foreground)] hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
-          </a>
-        </div>
-      </div>
-    </footer>
-  );
-}
+            className="text-[var(--muted)] underline-offset-4

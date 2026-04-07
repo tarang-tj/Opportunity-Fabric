@@ -83,6 +83,16 @@ export default function Home() {
                 <strong className="font-medium text-[var(--foreground)]/85">Clear</strong> on the
                 roadmap page if you want a fresh start.
               </p>
+              <p className="mx-auto mt-4 max-w-lg text-xs leading-relaxed text-[var(--muted)]">
+                Meeting with a mentor? Open the{" "}
+                <Link
+                  href="/mentor"
+                  className="font-semibold text-[var(--accent)] underline-offset-4 hover:underline"
+                >
+                  mentor summary
+                </Link>{" "}
+                for a print-friendly snapshot with every &ldquo;why&rdquo; spelled out.
+              </p>
             </div>
 
             <div
@@ -203,20 +213,4 @@ export default function Home() {
                 </h3>
                 <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
                   The questionnaire is friendly and specific. On the other side you get a visual
-                  timeline you can print, export, share as a link, or revisit from saved plans on
-                  this device.
-                </p>
-                <Link
-                  href="/onboarding"
-                  className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[var(--accent)] underline-offset-4 hover:underline"
-                >
-                  Start the questionnaire <span aria-hidden>→</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </>
-  );
-}
+                  timeline you can print, export, share as a link, or revisi

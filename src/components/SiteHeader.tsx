@@ -33,6 +33,7 @@ const nav = [
   { href: "/onboarding", label: "Your profile" },
   { href: "/plans", label: "Saved plans" },
   { href: "/plans/compare", label: "Compare" },
+  { href: "/mentor", label: "Mentor view" },
   { href: "/import", label: "Import .md" },
   { href: "/roadmap", label: "My roadmap", primary: true as const },
 ];
@@ -177,8 +178,3 @@ export function SiteHeader() {
               <ThemeToggle />
             </div>
           </nav>
-        </div>
-      )}
-    </header>
-  );
-}

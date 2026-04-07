@@ -363,6 +363,12 @@ export default function RoadmapPage() {
                 >
                   Copy share link
                 </button>
+                <Link
+                  href="/mentor"
+                  className="rounded-full border-2 border-[var(--foreground)]/12 bg-[var(--card)] px-4 py-2.5 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/45"
+                >
+                  Mentor summary
+                </Link>
                 <button
                   type="button"
                   onClick={() => setShowSave((s) => !s)}
@@ -523,15 +529,4 @@ export default function RoadmapPage() {
                 </Link>
                 <Link
                   href="/import"
-                  className="rounded-full border-2 border-[var(--foreground)]/15 px-6 py-3 text-sm font-bold text-[var(--foreground)] transition hover:border-[var(--accent)]/50"
-                >
-                  Preview .md file
-                </Link>
-              </div>
-            </div>
-          </>
-        )}
-      </main>
-    </>
-  );
-}
+                  clas
