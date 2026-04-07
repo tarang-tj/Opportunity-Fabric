@@ -178,3 +178,8 @@ export function SiteHeader() {
               <ThemeToggle />
             </div>
           </nav>
+        </div>
+      )}
+    </header>
+  );
+}
